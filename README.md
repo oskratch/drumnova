@@ -42,6 +42,17 @@ An interactive rhythm machine inspired by Redrum, fully functional in the browse
 - **Demo Patterns**: Load pre-recorded bases into current block
 - **Block buttons (1/2/4/8)**: Set how many blocks are active
 - **◄ ► Navigation**: Switch between blocks to edit different sections
+- **▶ Preview buttons**: Test individual instrument sounds
+
+### Block System
+- **1 block** = 16 steps (basic patterns)
+- **2 blocks** = 32 steps (intro + verse, build-ups)
+- **4 blocks** = 64 steps (full song sections)
+- **8 blocks** = 128 steps (complete compositions)
+
+When loading demo patterns:
+- Short patterns (16 steps) fill all active blocks with the same pattern
+- Long patterns (32+ steps) automatically expand blocks to fit and distribute across them
 
 ## 🔧 Integrating Your Sound Library
 

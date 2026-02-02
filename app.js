@@ -28,11 +28,11 @@ class DrumMachine {
         // Demo patterns (updated for 8 channels)
         this.demoPatterns = {
             basic: {
-                name: 'Basic Rock',
+                name: 'Rock Steady',
                 pattern: [
-                    [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], // Kick
-                    [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare
-                    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0], // HiHat
+                    [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], // Kick - steady 4/4
+                    [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare - backbeat
+                    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0], // HiHat - 16th notes
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Clap
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Tom
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Perc
@@ -41,42 +41,95 @@ class DrumMachine {
                 ]
             },
             funk: {
-                name: 'Funk Groove',
+                name: 'Funk Soul',
                 pattern: [
-                    [1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0], // Kick
-                    [0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0], // Snare
-                    [1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1], // HiHat
-                    [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // Clap
-                    [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0], // Tom
-                    [0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0], // Perc
+                    [1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0], // Kick - syncopated
+                    [0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0], // Snare - ghost notes
+                    [1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1], // HiHat - funky pattern
+                    [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // Clap - accent
+                    [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0], // Tom - low fill
+                    [0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0], // Perc - cowbell
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Cymbal
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // FX
                 ]
             },
             hiphop: {
-                name: 'Hip Hop',
+                name: 'Boom Bap',
                 pattern: [
-                    [1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0], // Kick
-                    [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare
-                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], // HiHat
-                    [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0], // Clap
+                    [1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0], // Kick - boom bap
+                    [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare - tight
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], // HiHat - fast
+                    [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0], // Clap - layered
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Tom
-                    [0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1], // Perc
+                    [0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1], // Perc - shaker
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Cymbal
-                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // FX
+                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // FX - scratch
                 ]
             },
             techno: {
-                name: 'Techno',
+                name: 'Industrial Pulse',
                 pattern: [
-                    [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], // Kick
-                    [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // Snare
-                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], // HiHat
-                    [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Clap
+                    // Block 1 - Build up
+                    [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0, 1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
+                    [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0, 0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0, 0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                ]
+            },
+            bluemonday: {
+                name: 'New Wave Icon',
+                pattern: [
+                    [1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // Kick - iconic pattern
+                    [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare - steady
+                    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0], // HiHat - alternating
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Clap
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Tom
-                    [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0], // Perc
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1], // Cymbal
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Perc
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Cymbal
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // FX
+                ]
+            },
+            house: {
+                name: 'Four to the Floor',
+                pattern: [
+                    [1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // Kick - four to floor
+                    [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare - backbeat
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], // HiHat - fast
+                    [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Clap - layered
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Tom
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Perc
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Cymbal
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // FX
+                ]
+            },
+            build: {
+                name: 'Tension Build',
+                pattern: [
+                    [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], // Kick - steady
+                    [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare - basic
+                    [0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1], // HiHat - build up
+                    [0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0], // Clap - late entry
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Tom
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Perc
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Cymbal
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // FX
+                ]
+            },
+            complex: {
+                name: 'Poly Rhythm',
+                pattern: [
+                    [1,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0], // Kick - syncopated
+                    [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1], // Snare - ghost + accent
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], // HiHat - full
+                    [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0], // Clap - off-beats
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Tom
+                    [0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1], // Perc - fast
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Cymbal
+                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // FX - intro
                 ]
             }
         };
@@ -502,17 +555,42 @@ class DrumMachine {
     loadDemoPattern(patternKey) {
         const pattern = this.demoPatterns[patternKey];
         if (!pattern) return;
-        
-        this.clearPattern();
-        
-        for (let channel = 0; channel < this.channels; channel++) {
-            for (let step = 0; step < this.steps; step++) {
-                this.sequence[this.currentBlock][channel][step] = pattern.pattern[channel][step] === 1;
-                this.updatePadUI(channel, step);
+
+        // Clear all active blocks
+        for (let blockIndex = 0; blockIndex < this.totalBlocks; blockIndex++) {
+            this.sequence[blockIndex] = Array(this.channels).fill(null).map(() => Array(this.steps).fill(false));
+        }
+
+        // Calculate how many blocks this pattern spans
+        const patternSteps = pattern.pattern[0].length; // Assume all channels have same length
+        const blocksNeeded = Math.ceil(patternSteps / this.steps);
+
+        // If pattern is longer than available blocks, expand to fit
+        if (blocksNeeded > this.totalBlocks) {
+            this.setTotalBlocks(Math.min(blocksNeeded, 8)); // Max 8 blocks
+        }
+
+        // Load pattern across blocks
+        for (let blockIndex = 0; blockIndex < this.totalBlocks; blockIndex++) {
+            const startStep = blockIndex * this.steps;
+            const endStep = Math.min(startStep + this.steps, patternSteps);
+
+            for (let channel = 0; channel < this.channels; channel++) {
+                for (let step = 0; step < this.steps; step++) {
+                    const patternStep = startStep + step;
+                    if (patternStep < patternSteps) {
+                        this.sequence[blockIndex][channel][step] = pattern.pattern[channel][patternStep] === 1;
+                    } else {
+                        this.sequence[blockIndex][channel][step] = false; // Fill remaining with false
+                    }
+                }
             }
         }
-        
-        console.log(`Loaded pattern: ${pattern.name}`);
+
+        // Update UI for current block
+        this.updateBlockDisplay();
+
+        console.log(`Loaded pattern "${pattern.name}" (${patternSteps} steps) into ${this.totalBlocks} blocks`);
     }
     
     // Export pattern (for future save functionality)
