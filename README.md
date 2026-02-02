@@ -4,9 +4,13 @@ An interactive rhythm machine inspired by Redrum, fully functional in the browse
 
 ## 🎵 Features
 
-- **16 steps x 4 channels** sequencer grid
+- **16 steps x 8 channels** sequencer grid
+- **Block system**: Choose 1, 2, 4, or 8 blocks for extended patterns (up to 128 steps total)
+- **Block navigation**: Switch between blocks to program different sections
+- **Seamless playback**: Play travels through all active blocks in sequence
 - **Demo patterns** preconfigured (Rock, Funk, Hip Hop, Techno)
-- **Sound selection** for each channel via dropdown
+- **8 instrument channels**: Kick, Snare, HiHat, Clap, Tom, Perc, Cymbal, FX
+- **Multiple sound variations**: 4-5 different sounds per instrument
 - **BPM control** adjustable (60-200 BPM)
 - **Visual interface** hardware-style with responsive colors
 - **Web Audio API** for low-latency audio playback
@@ -23,18 +27,21 @@ An interactive rhythm machine inspired by Redrum, fully functional in the browse
 ## 🎹 How It Works
 
 ### Structure
-- Each **row** = an instrument (Kick, Snare, HiHat, Perc)
+- Each **row** = an instrument (Kick, Snare, HiHat, Clap, Tom, Perc, Cymbal, FX)
 - Each **column** = a beat step
+- Each **block** = 16 steps of all instruments
 - **Blue pads** = activated
 - **Green/yellow pads** = currently playing
 
 ### Controls
 - **Play/Pause**: Start or pause playback
 - **Stop**: Stop and return to beginning
-- **Clear**: Erase entire pattern
+- **Clear**: Erase current block's pattern
 - **BPM Slider**: Adjust speed (60-200 BPM)
-- **Sound selectors**: Choose different sounds for each instrument
-- **Demo Patterns**: Load pre-recorded bases
+- **Sound selectors**: Choose different sounds for each instrument (4-5 variations each)
+- **Demo Patterns**: Load pre-recorded bases into current block
+- **Block buttons (1/2/4/8)**: Set how many blocks are active
+- **◄ ► Navigation**: Switch between blocks to edit different sections
 
 ## 🔧 Integrating Your Sound Library
 
@@ -114,8 +121,8 @@ Edit `style.css` to change colors, sizes, gradients, etc.
 ### Add more channels or steps
 In `app.js`, modify:
 ```javascript
-this.channels = 4;  // Number of rows (instruments)
-this.steps = 16;    // Number of columns (beats)
+this.channels = 8;  // Number of rows (instruments)
+this.steps = 16;    // Number of columns (beats per block)
 ```
 
 ### Add new demo patterns
@@ -124,10 +131,14 @@ In `app.js`, inside `this.demoPatterns`, add:
 myNewPattern: {
     name: 'My Pattern Name',
     pattern: [
-        [1,0,0,0,...], // Kick
+        [1,0,0,0,...], // Kick (8 channels total now)
         [0,0,1,0,...], // Snare
         [1,1,1,1,...], // HiHat
-        [0,0,0,0,...]  // Perc
+        [0,0,0,0,...], // Clap
+        [0,0,0,0,...], // Tom
+        [0,0,0,0,...], // Perc
+        [0,0,0,0,...], // Cymbal
+        [0,0,0,0,...]  // FX
     ]
 }
 ```
@@ -143,14 +154,15 @@ If you want to add server functionality:
 
 ### Possible Extensions
 - ✅ Export/Import patterns (already implemented at JS level)
+- ✅ 8 channels with multiple sound variations
+- ✅ Block system (1/2/4/8 blocks = up to 128 steps)
 - ⬜ Save to browser localStorage
-- ⬜ More channels (up to 8-16)
+- ⬜ Copy/paste blocks
 - ⬜ Effects (reverb, delay, filter)
 - ⬜ Volume control per channel
 - ⬜ Mute/Solo per channel
 - ⬜ Swing/Shuffle
 - ⬜ Step subdivision (32 steps)
-- ⬜ Chain patterns
 - ⬜ MIDI sync/export
 
 ## 📝 License

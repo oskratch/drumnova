@@ -4,24 +4,28 @@
 
 class DrumMachine {
     constructor() {
-        this.channels = 4;
+        this.channels = 8;
         this.steps = 16;
         this.currentStep = 0;
         this.isPlaying = false;
         this.bpm = 120;
         this.intervalId = null;
         
-        // Sequencer data: array of arrays (channels x steps)
-        this.sequence = Array(this.channels).fill(null).map(() => Array(this.steps).fill(false));
+        // Block system
+        this.totalBlocks = 1; // Can be 1, 2, 4, or 8
+        this.currentBlock = 0; // Which block we're viewing/editing
+        
+        // Sequencer data: 3D array (blocks x channels x steps)
+        this.sequence = this.createEmptySequence();
         
         // Sound mapping for each channel
-        this.soundMap = ['kick', 'snare', 'hihat', 'perc'];
+        this.soundMap = ['kick', 'snare', 'hihat', 'clap', 'tom', 'perc', 'cymbal', 'fx'];
         
         // Audio context and buffers
         this.audioContext = null;
         this.audioBuffers = {};
         
-        // Demo patterns
+        // Demo patterns (updated for 8 channels)
         this.demoPatterns = {
             basic: {
                 name: 'Basic Rock',
@@ -29,7 +33,11 @@ class DrumMachine {
                     [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], // Kick
                     [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare
                     [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0], // HiHat
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // Perc
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Clap
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Tom
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Perc
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Cymbal
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // FX
                 ]
             },
             funk: {
@@ -38,7 +46,11 @@ class DrumMachine {
                     [1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0], // Kick
                     [0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0], // Snare
                     [1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1], // HiHat
-                    [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]  // Perc
+                    [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // Clap
+                    [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0], // Tom
+                    [0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0], // Perc
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Cymbal
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // FX
                 ]
             },
             hiphop: {
@@ -47,7 +59,11 @@ class DrumMachine {
                     [1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0], // Kick
                     [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], // HiHat
-                    [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0]  // Perc
+                    [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0], // Clap
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Tom
+                    [0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1], // Perc
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Cymbal
+                    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // FX
                 ]
             },
             techno: {
@@ -56,12 +72,25 @@ class DrumMachine {
                     [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], // Kick
                     [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // Snare
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], // HiHat
-                    [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0]  // Perc
+                    [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Clap
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // Tom
+                    [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0], // Perc
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1], // Cymbal
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  // FX
                 ]
             }
         };
         
         this.init();
+    }
+    
+    createEmptySequence() {
+        // Create 8 blocks, each with 8 channels, each with 16 steps
+        return Array(8).fill(null).map(() => 
+            Array(this.channels).fill(null).map(() => 
+                Array(this.steps).fill(false)
+            )
+        );
     }
     
     async init() {
@@ -123,6 +152,29 @@ class DrumMachine {
             }
         });
         
+        // Block buttons
+        document.querySelectorAll('.block-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const blocks = parseInt(e.target.dataset.blocks);
+                this.setTotalBlocks(blocks);
+            });
+        });
+        
+        // Block navigation
+        document.getElementById('prevBlock').addEventListener('click', () => {
+            if (this.currentBlock > 0) {
+                this.currentBlock--;
+                this.updateBlockDisplay();
+            }
+        });
+        
+        document.getElementById('nextBlock').addEventListener('click', () => {
+            if (this.currentBlock < this.totalBlocks - 1) {
+                this.currentBlock++;
+                this.updateBlockDisplay();
+            }
+        });
+        
         // Pattern selector
         document.getElementById('loadPattern').addEventListener('click', () => {
             const patternKey = document.getElementById('patternSelect').value;
@@ -147,10 +199,14 @@ class DrumMachine {
         // Lista de sons a generar (per defecte generarem sons sintètics)
         // L'usuari podrà substituir-los pels seus propis fitxers
         const sounds = [
-            'kick', 'kick2', 'kick3',
-            'snare', 'snare2', 'snare3',
-            'hihat', 'hihat2', 'hihat3',
-            'perc', 'perc2', 'perc3'
+            'kick', 'kick2', 'kick3', 'kick4', 'kick5',
+            'snare', 'snare2', 'snare3', 'snare4', 'snare5',
+            'hihat', 'hihat2', 'hihat3', 'hihat4', 'hihat5',
+            'clap', 'clap2', 'clap3', 'clap4',
+            'tom', 'tom2', 'tom3', 'tom4',
+            'perc', 'perc2', 'perc3', 'perc4', 'perc5',
+            'cymbal', 'cymbal2', 'cymbal3', 'cymbal4',
+            'fx', 'fx2', 'fx3', 'fx4', 'fx5'
         ];
         
         // Generar sons sintètics de mostra
@@ -169,16 +225,37 @@ class DrumMachine {
         // Diferents paràmetres segons el tipus de so
         if (type.startsWith('kick')) {
             duration = 0.5;
-            frequency = type === 'kick' ? 150 : (type === 'kick2' ? 100 : 180);
+            const variants = { kick: 150, kick2: 100, kick3: 180, kick4: 120, kick5: 160 };
+            frequency = variants[type] || 150;
             decay = 0.3;
         } else if (type.startsWith('snare')) {
             duration = 0.3;
-            frequency = type === 'snare' ? 200 : (type === 'snare2' ? 180 : 220);
+            const variants = { snare: 200, snare2: 180, snare3: 220, snare4: 240, snare5: 190 };
+            frequency = variants[type] || 200;
             decay = 0.2;
         } else if (type.startsWith('hihat')) {
-            duration = type === 'hihat2' ? 0.3 : 0.1;
+            const variants = { hihat: 0.1, hihat2: 0.3, hihat3: 0.15, hihat4: 0.08, hihat5: 0.12 };
+            duration = variants[type] || 0.1;
             frequency = 8000;
-            decay = type === 'hihat2' ? 0.2 : 0.05;
+            decay = duration * 0.5;
+        } else if (type.startsWith('clap')) {
+            duration = 0.2;
+            frequency = 1000;
+            decay = 0.15;
+        } else if (type.startsWith('tom')) {
+            duration = 0.4;
+            const variants = { tom: 120, tom2: 180, tom3: 250, tom4: 150 };
+            frequency = variants[type] || 150;
+            decay = 0.25;
+        } else if (type.startsWith('cymbal')) {
+            duration = type === 'cymbal2' ? 1.5 : 0.8;
+            frequency = 10000;
+            decay = duration * 0.4;
+        } else if (type.startsWith('fx')) {
+            duration = 0.3;
+            const variants = { fx: 2000, fx2: 500, fx3: 1500, fx4: 3000, fx5: 800 };
+            frequency = variants[type] || 2000;
+            decay = 0.2;
         } else {
             duration = 0.2;
             frequency = 800;
@@ -200,8 +277,18 @@ class DrumMachine {
                 const noise = (Math.random() * 2 - 1) * 0.5;
                 const tone = Math.sin(2 * Math.PI * frequency * t) * 0.5;
                 data[i] = (noise + tone) * envelope;
-            } else if (type.startsWith('hihat')) {
+            } else if (type.startsWith('hihat') || type.startsWith('cymbal')) {
                 data[i] = (Math.random() * 2 - 1) * envelope;
+            } else if (type.startsWith('clap')) {
+                // Multiple short bursts for clap effect
+                const burst = Math.floor(t * 40) % 3 === 0 ? 1 : 0.3;
+                data[i] = (Math.random() * 2 - 1) * envelope * burst;
+            } else if (type.startsWith('tom')) {
+                const freqSweep = frequency * Math.exp(-t * 8);
+                data[i] = Math.sin(2 * Math.PI * freqSweep * t) * envelope;
+            } else if (type.startsWith('fx')) {
+                const modulation = Math.sin(2 * Math.PI * 10 * t);
+                data[i] = Math.sin(2 * Math.PI * frequency * t * (1 + modulation * 0.5)) * envelope;
             } else {
                 data[i] = Math.sin(2 * Math.PI * frequency * t) * envelope;
             }
@@ -245,18 +332,58 @@ class DrumMachine {
     
     // Toggle pad state
     togglePad(channel, step) {
-        this.sequence[channel][step] = !this.sequence[channel][step];
+        this.sequence[this.currentBlock][channel][step] = !this.sequence[this.currentBlock][channel][step];
         this.updatePadUI(channel, step);
     }
     
     // Update pad visual state
     updatePadUI(channel, step) {
         const pad = document.querySelector(`[data-channel="${channel}"][data-step="${step}"]`);
-        if (this.sequence[channel][step]) {
+        if (this.sequence[this.currentBlock][channel][step]) {
             pad.classList.add('active');
         } else {
             pad.classList.remove('active');
         }
+    }
+    
+    // Set total blocks
+    setTotalBlocks(blocks) {
+        this.totalBlocks = blocks;
+        
+        // Update UI
+        document.querySelectorAll('.block-btn').forEach(btn => {
+            if (parseInt(btn.dataset.blocks) === blocks) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        // Reset to first block if current is out of range
+        if (this.currentBlock >= this.totalBlocks) {
+            this.currentBlock = 0;
+            this.updateBlockDisplay();
+        } else {
+            this.updateBlockIndicator();
+        }
+    }
+    
+    // Update block display (reload grid with current block data)
+    updateBlockDisplay() {
+        // Reload all pad states from current block
+        for (let channel = 0; channel < this.channels; channel++) {
+            for (let step = 0; step < this.steps; step++) {
+                this.updatePadUI(channel, step);
+            }
+        }
+        this.updateBlockIndicator();
+    }
+    
+    // Update block indicator text and navigation buttons
+    updateBlockIndicator() {
+        document.getElementById('blockIndicator').textContent = `Block ${this.currentBlock + 1}/${this.totalBlocks}`;
+        document.getElementById('prevBlock').disabled = this.currentBlock === 0;
+        document.getElementById('nextBlock').disabled = this.currentBlock === this.totalBlocks - 1;
     }
     
     // Play sequence
@@ -273,7 +400,13 @@ class DrumMachine {
         
         this.intervalId = setInterval(() => {
             this.processStep();
-            this.currentStep = (this.currentStep + 1) % this.steps;
+            this.currentStep++;
+            
+            // Calculate total steps (blocks * steps per block)
+            const totalSteps = this.totalBlocks * this.steps;
+            if (this.currentStep >= totalSteps) {
+                this.currentStep = 0;
+            }
         }, stepDuration);
     }
     
@@ -294,23 +427,41 @@ class DrumMachine {
     
     // Process current step
     processStep() {
-        // Clear previous playing indicators
-        this.clearPlayingIndicators();
+        // Calculate which block and which step within that block
+        const blockIndex = Math.floor(this.currentStep / this.steps);
+        const stepInBlock = this.currentStep % this.steps;
+        
+        // Only show visual feedback if we're viewing the currently playing block
+        const shouldShowVisual = blockIndex === this.currentBlock;
+        
+        // Clear previous playing indicators (only in current view)
+        if (shouldShowVisual) {
+            this.clearPlayingIndicators();
+        }
         
         // Play sounds and highlight active pads
         for (let channel = 0; channel < this.channels; channel++) {
-            const pad = document.querySelector(`[data-channel="${channel}"][data-step="${this.currentStep}"]`);
-            
-            if (this.sequence[channel][this.currentStep]) {
+            // Check if this step is active in the current playing block
+            if (this.sequence[blockIndex][channel][stepInBlock]) {
                 const soundName = this.soundMap[channel];
                 this.playSound(soundName);
-                pad.classList.add('playing');
-            } else {
-                // Show current step even if not active
-                pad.style.opacity = '0.7';
-                setTimeout(() => {
-                    pad.style.opacity = '1';
-                }, 50);
+                
+                // Only show visual feedback if viewing the playing block
+                if (shouldShowVisual) {
+                    const pad = document.querySelector(`[data-channel="${channel}"][data-step="${stepInBlock}"]`);
+                    if (pad) {
+                        pad.classList.add('playing');
+                    }
+                }
+            } else if (shouldShowVisual) {
+                // Show current step even if not active (visual feedback)
+                const pad = document.querySelector(`[data-channel="${channel}"][data-step="${stepInBlock}"]`);
+                if (pad) {
+                    pad.style.opacity = '0.7';
+                    setTimeout(() => {
+                        pad.style.opacity = '1';
+                    }, 50);
+                }
             }
         }
     }
@@ -324,7 +475,9 @@ class DrumMachine {
     
     // Clear pattern
     clearPattern() {
-        this.sequence = Array(this.channels).fill(null).map(() => Array(this.steps).fill(false));
+        // Clear only the current block or all blocks?
+        // Let's clear only current block for now
+        this.sequence[this.currentBlock] = Array(this.channels).fill(null).map(() => Array(this.steps).fill(false));
         document.querySelectorAll('.pad').forEach(pad => {
             pad.classList.remove('active');
         });
@@ -339,7 +492,7 @@ class DrumMachine {
         
         for (let channel = 0; channel < this.channels; channel++) {
             for (let step = 0; step < this.steps; step++) {
-                this.sequence[channel][step] = pattern.pattern[channel][step] === 1;
+                this.sequence[this.currentBlock][channel][step] = pattern.pattern[channel][step] === 1;
                 this.updatePadUI(channel, step);
             }
         }
@@ -352,8 +505,12 @@ class DrumMachine {
         return {
             name: 'Custom Pattern',
             bpm: this.bpm,
+            totalBlocks: this.totalBlocks,
             soundMap: [...this.soundMap],
-            pattern: this.sequence.map(channel => channel.map(step => step ? 1 : 0))
+            // Only export active blocks
+            pattern: this.sequence.slice(0, this.totalBlocks).map(block =>
+                block.map(channel => channel.map(step => step ? 1 : 0))
+            )
         };
     }
     
@@ -365,6 +522,10 @@ class DrumMachine {
             document.getElementById('bpmValue').textContent = this.bpm;
         }
         
+        if (patternData.totalBlocks) {
+            this.setTotalBlocks(patternData.totalBlocks);
+        }
+        
         if (patternData.soundMap) {
             this.soundMap = [...patternData.soundMap];
             // Update selectors
@@ -374,13 +535,16 @@ class DrumMachine {
         }
         
         if (patternData.pattern) {
-            this.clearPattern();
-            for (let channel = 0; channel < this.channels; channel++) {
-                for (let step = 0; step < this.steps; step++) {
-                    this.sequence[channel][step] = patternData.pattern[channel][step] === 1;
-                    this.updatePadUI(channel, step);
+            // Import all blocks from pattern
+            for (let blockIndex = 0; blockIndex < patternData.pattern.length; blockIndex++) {
+                for (let channel = 0; channel < this.channels; channel++) {
+                    for (let step = 0; step < this.steps; step++) {
+                        this.sequence[blockIndex][channel][step] = patternData.pattern[blockIndex][channel][step] === 1;
+                    }
                 }
             }
+            // Update display
+            this.updateBlockDisplay();
         }
     }
 }

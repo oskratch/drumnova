@@ -25,17 +25,33 @@
                 <input type="range" id="bpmSlider" min="60" max="200" value="120" step="1">
             </div>
 
+            <!-- Block Control -->
+            <div class="block-section">
+                <label>Blocks:</label>
+                <div class="block-buttons">
+                    <button class="block-btn active" data-blocks="1">1</button>
+                    <button class="block-btn" data-blocks="2">2</button>
+                    <button class="block-btn" data-blocks="4">4</button>
+                    <button class="block-btn" data-blocks="8">8</button>
+                </div>
+                <div class="block-navigation">
+                    <button id="prevBlock" class="nav-btn">◄</button>
+                    <span id="blockIndicator">Block 1/1</span>
+                    <button id="nextBlock" class="nav-btn">►</button>
+                </div>
+            </div>
+
             <!-- Pattern Selector -->
             <div class="pattern-section">
                 <label for="patternSelect">Demo Patterns:</label>
                 <select id="patternSelect">
-                    <option value="">-- Selecciona un patró --</option>
+                    <option value="">-- Select a pattern --</option>
                     <option value="basic">Basic Rock</option>
                     <option value="funk">Funk Groove</option>
                     <option value="hiphop">Hip Hop</option>
                     <option value="techno">Techno</option>
                 </select>
-                <button id="loadPattern" class="btn btn-secondary">Carrega Patró</button>
+                <button id="loadPattern" class="btn btn-secondary">Load Pattern</button>
             </div>
 
             <!-- Sequencer Grid -->
@@ -48,6 +64,8 @@
                             <option value="kick">Kick 808</option>
                             <option value="kick2">Kick Acoustic</option>
                             <option value="kick3">Kick Electro</option>
+                            <option value="kick4">Kick Deep</option>
+                            <option value="kick5">Kick Punchy</option>
                         </select>
                     </div>
                     <div class="channel-label">
@@ -56,6 +74,8 @@
                             <option value="snare">Snare 808</option>
                             <option value="snare2">Snare Acoustic</option>
                             <option value="snare3">Snare Clap</option>
+                            <option value="snare4">Snare Tight</option>
+                            <option value="snare5">Snare Rimshot</option>
                         </select>
                     </div>
                     <div class="channel-label">
@@ -64,14 +84,55 @@
                             <option value="hihat">HiHat Closed</option>
                             <option value="hihat2">HiHat Open</option>
                             <option value="hihat3">HiHat Pedal</option>
+                            <option value="hihat4">HiHat Tight</option>
+                            <option value="hihat5">HiHat 909</option>
+                        </select>
+                    </div>
+                    <div class="channel-label">
+                        <span class="instrument-name">Clap</span>
+                        <select class="sound-selector" data-channel="3">
+                            <option value="clap">Clap 808</option>
+                            <option value="clap2">Clap Room</option>
+                            <option value="clap3">Clap Snap</option>
+                            <option value="clap4">Clap Thick</option>
+                        </select>
+                    </div>
+                    <div class="channel-label">
+                        <span class="instrument-name">Tom</span>
+                        <select class="sound-selector" data-channel="4">
+                            <option value="tom">Tom Low</option>
+                            <option value="tom2">Tom Mid</option>
+                            <option value="tom3">Tom High</option>
+                            <option value="tom4">Tom 808</option>
                         </select>
                     </div>
                     <div class="channel-label">
                         <span class="instrument-name">Perc</span>
-                        <select class="sound-selector" data-channel="3">
+                        <select class="sound-selector" data-channel="5">
                             <option value="perc">Cowbell</option>
-                            <option value="perc2">Clap</option>
-                            <option value="perc3">Rim</option>
+                            <option value="perc2">Rim</option>
+                            <option value="perc3">Conga</option>
+                            <option value="perc4">Shaker</option>
+                            <option value="perc5">Tambourine</option>
+                        </select>
+                    </div>
+                    <div class="channel-label">
+                        <span class="instrument-name">Cymbal</span>
+                        <select class="sound-selector" data-channel="6">
+                            <option value="cymbal">Crash</option>
+                            <option value="cymbal2">Ride</option>
+                            <option value="cymbal3">China</option>
+                            <option value="cymbal4">Splash</option>
+                        </select>
+                    </div>
+                    <div class="channel-label">
+                        <span class="instrument-name">FX</span>
+                        <select class="sound-selector" data-channel="7">
+                            <option value="fx">Noise</option>
+                            <option value="fx2">Zap</option>
+                            <option value="fx3">Beep</option>
+                            <option value="fx4">Scratch</option>
+                            <option value="fx5">Laser</option>
                         </select>
                     </div>
                 </div>
@@ -94,12 +155,15 @@
 
             <!-- Info Panel -->
             <div class="info-panel">
-                <p><strong>Instruccions:</strong></p>
+                <p><strong>Instructions:</strong></p>
                 <ul>
-                    <li>Fes click als pads per activar/desactivar els beats</li>
-                    <li>Selecciona diferents sons per cada instrument</li>
-                    <li>Carrega patrons demo per començar ràpid</li>
-                    <li>Ajusta el BPM amb el slider</li>
+                    <li>Click on pads to activate/deactivate beats</li>
+                    <li>Select different sounds for each instrument</li>
+                    <li>Choose 1, 2, 4, or 8 blocks for longer patterns</li>
+                    <li>Navigate between blocks with ◄ ► buttons</li>
+                    <li>Load demo patterns to get started quickly</li>
+                    <li>Adjust BPM with the slider</li>
+                    <li>Play travels through all active blocks in sequence</li>
                 </ul>
             </div>
         </div>
