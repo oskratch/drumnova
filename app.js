@@ -190,6 +190,21 @@ class DrumMachine {
                 this.soundMap[channel] = e.target.value;
             });
         });
+        
+        // Preview buttons
+        document.querySelectorAll('.preview-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const channel = parseInt(e.target.dataset.channel);
+                const soundName = this.soundMap[channel];
+                this.playSound(soundName);
+                
+                // Visual feedback
+                e.target.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    e.target.style.transform = 'scale(1)';
+                }, 100);
+            });
+        });
     }
     
     // Initialize Web Audio API

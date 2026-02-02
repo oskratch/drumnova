@@ -286,35 +286,43 @@ body {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    min-width: 200px;
 }
 
 .label-header {
-    height: 30px;
+    height: 41px;
     display: flex;
     align-items: center;
     font-size: 12px;
     font-weight: bold;
     color: #667eea;
-    margin-bottom: 2px;
+    padding-left: 12px;
 }
 
 .channel-label {
-    height: 60px;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 8px 12px;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    min-width: 180px;
+    /* Match the height of grid rows - will be set by grid auto-sizing */
+    min-height:68px;
+}
+
+.label-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
 }
 
 .instrument-name {
     font-weight: bold;
     font-size: 14px;
-    margin-bottom: 5px;
     color: #38ef7d;
+    line-height: 1;
 }
 
 .sound-selector {
@@ -333,6 +341,34 @@ body {
     border-color: #667eea;
 }
 
+.preview-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border: 2px solid #3a3a4e;
+    border-radius: 6px;
+    background: linear-gradient(145deg, #2a2a3e, #1f1f2e);
+    color: #38ef7d;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.preview-btn:hover {
+    border-color: #38ef7d;
+    background: linear-gradient(145deg, #38ef7d, #11998e);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(56, 239, 125, 0.5);
+}
+
+.preview-btn:active {
+    transform: scale(0.95);
+}
+
 .grid-container {
     flex: 1;
 }
@@ -340,18 +376,16 @@ body {
 .step-indicators {
     display: flex;
     flex-direction: column;
-    margin-bottom: 2px;
 }
 
 .indicator-header {
-    height: 30px;
+    height: 32px;
 }
 
 .step-numbers {
     display: grid;
     grid-template-columns: repeat(16, 1fr);
     gap: 2px;
-    margin-bottom: 2px;
 }
 
 .step-numbers span {
@@ -371,6 +405,7 @@ body {
     display: grid;
     grid-template-columns: repeat(16, 1fr);
     gap: 2px;
+    min-height: 50px;
 }
 
 /* Pads */
