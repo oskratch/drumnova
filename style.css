@@ -373,6 +373,47 @@ body {
     transform: scale(0.95);
 }
 
+.mute-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border: 2px solid #3a3a4e;
+    border-radius: 6px;
+    background: linear-gradient(145deg, #2a2a3e, #1f1f2e);
+    color: #38ef7d;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-right: 8px;
+}
+
+.mute-btn:hover {
+    border-color: #38ef7d;
+    background: linear-gradient(145deg, #38ef7d, #11998e);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(56, 239, 125, 0.5);
+}
+
+.mute-btn:active {
+    transform: scale(0.95);
+}
+
+.mute-btn.muted {
+    background: linear-gradient(145deg, #e53e3e, #c53030);
+    border-color: #e53e3e;
+    color: #fed7d7;
+}
+
+.mute-btn.muted:hover {
+    background: linear-gradient(145deg, #c53030, #9b2c2c);
+    border-color: #fc8181;
+    box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
+}
+
 .grid-container {
     flex: 1;
 }

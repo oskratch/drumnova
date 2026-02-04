@@ -21,6 +21,9 @@ class DrumMachine {
         // Sound mapping for each channel
         this.soundMap = ['kick', 'snare', 'hihat', 'clap', 'tom', 'perc', 'cymbal', 'fx'];
         
+        // Mute state for each channel
+        this.mutedChannels = [false, false, false, false, false, false, false, false];
+        
         // Audio context and buffers
         this.audioContext = null;
         this.audioBuffers = {};
@@ -248,7 +251,8 @@ class DrumMachine {
         document.querySelectorAll('.preview-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const channel = parseInt(e.target.dataset.channel);
-                const soundName = this.soundMap[channel];
+                const selector = document.querySelector(`.sound-selector[data-channel="${channel}"]`);
+                const soundName = selector.value;
                 this.playSound(soundName);
                 
                 // Visual feedback
@@ -256,6 +260,23 @@ class DrumMachine {
                 setTimeout(() => {
                     e.target.style.transform = 'scale(1)';
                 }, 100);
+            });
+        });
+        
+        // Mute buttons
+        document.querySelectorAll('.mute-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const channel = parseInt(e.target.dataset.channel);
+                this.toggleMute(channel);
+                
+                // Update button appearance
+                if (this.mutedChannels[channel]) {
+                    e.target.classList.add('muted');
+                    e.target.textContent = '🔇';
+                } else {
+                    e.target.classList.remove('muted');
+                    e.target.textContent = '🔊';
+                }
             });
         });
     }
@@ -308,8 +329,21 @@ class DrumMachine {
             decay = duration * 0.5;
         } else if (type.startsWith('clap')) {
             duration = 0.2;
-            frequency = 1000;
+            const variants = { clap: 1000, clap2: 800, clap3: 1200, clap4: 600, clap5: 1500 };
+            frequency = variants[type] || 1000;
             decay = 0.15;
+        } else if (type.startsWith('perc')) {
+            const variants = {
+                perc: { freq: 800, dur: 0.15, dec: 0.1 },     // Shaker
+                perc2: { freq: 600, dur: 0.2, dec: 0.15 },    // Cowbell
+                perc3: { freq: 300, dur: 0.3, dec: 0.2 },     // Conga
+                perc4: { freq: 1200, dur: 0.1, dec: 0.08 },   // Woodblock
+                perc5: { freq: 400, dur: 0.25, dec: 0.18 }    // Tambourine
+            };
+            const variant = variants[type] || variants.perc;
+            duration = variant.dur;
+            frequency = variant.freq;
+            decay = variant.dec;
         } else if (type.startsWith('tom')) {
             duration = 0.4;
             const variants = { tom: 120, tom2: 180, tom3: 250, tom4: 150 };
@@ -320,10 +354,17 @@ class DrumMachine {
             frequency = 10000;
             decay = duration * 0.4;
         } else if (type.startsWith('fx')) {
-            duration = 0.3;
-            const variants = { fx: 2000, fx2: 500, fx3: 1500, fx4: 3000, fx5: 800 };
-            frequency = variants[type] || 2000;
-            decay = 0.2;
+            const variants = {
+                fx: { freq: 800, dur: 0.4, dec: 0.3 },      // Laser sweep
+                fx2: { freq: 150, dur: 0.8, dec: 0.6 },     // Deep sweep
+                fx3: { freq: 1200, dur: 0.2, dec: 0.1 },    // Sharp stab
+                fx4: { freq: 4000, dur: 0.1, dec: 0.05 },   // High noise
+                fx5: { freq: 600, dur: 0.6, dec: 0.4 }      // Bell-like
+            };
+            const variant = variants[type] || variants.fx;
+            duration = variant.dur;
+            frequency = variant.freq;
+            decay = variant.dec;
         } else {
             duration = 0.2;
             frequency = 800;
@@ -348,15 +389,92 @@ class DrumMachine {
             } else if (type.startsWith('hihat') || type.startsWith('cymbal')) {
                 data[i] = (Math.random() * 2 - 1) * envelope;
             } else if (type.startsWith('clap')) {
-                // Multiple short bursts for clap effect
-                const burst = Math.floor(t * 40) % 3 === 0 ? 1 : 0.3;
-                data[i] = (Math.random() * 2 - 1) * envelope * burst;
+                // Multiple short bursts for clap effect with variations
+                if (type === 'clap') {
+                    // Sharp clap
+                    const burst = Math.floor(t * 40) % 3 === 0 ? 1 : 0.3;
+                    data[i] = (Math.random() * 2 - 1) * envelope * burst;
+                } else if (type === 'clap2') {
+                    // Room clap - more reverb-like
+                    const burst = Math.floor(t * 30) % 4 === 0 ? 1 : 0.2;
+                    data[i] = (Math.random() * 2 - 1) * envelope * burst;
+                } else if (type === 'clap3') {
+                    // Echo clap - delayed bursts
+                    const burst1 = Math.floor(t * 50) % 5 === 0 ? 1 : 0;
+                    const burst2 = Math.floor((t - 0.05) * 50) % 5 === 0 ? 0.5 : 0;
+                    data[i] = (Math.random() * 2 - 1) * envelope * (burst1 + burst2);
+                } else if (type === 'clap4') {
+                    // Thick clap - layered
+                    const burst = Math.floor(t * 35) % 4 === 0 ? 1 : 0.4;
+                    const tone = Math.sin(2 * Math.PI * frequency * t) * 0.3;
+                    data[i] = ((Math.random() * 2 - 1) * burst + tone) * envelope;
+                } else if (type === 'clap5') {
+                    // Vintage clap - filtered
+                    const burst = Math.floor(t * 45) % 3 === 0 ? 1 : 0.5;
+                    const filter = Math.exp(-t * 30);
+                    data[i] = (Math.random() * 2 - 1) * envelope * burst * filter;
+                } else {
+                    const burst = Math.floor(t * 40) % 3 === 0 ? 1 : 0.3;
+                    data[i] = (Math.random() * 2 - 1) * envelope * burst;
+                }
+            } else if (type.startsWith('perc')) {
+                if (type === 'perc') {
+                    // Shaker - fast repeating clicks
+                    const click = Math.floor(t * 60) % 2 === 0 ? 1 : 0;
+                    data[i] = (Math.random() * 2 - 1) * envelope * click;
+                } else if (type === 'perc2') {
+                    // Cowbell - metallic tone
+                    const tone1 = Math.sin(2 * Math.PI * frequency * t);
+                    const tone2 = Math.sin(2 * Math.PI * frequency * 1.8 * t) * 0.5;
+                    data[i] = (tone1 + tone2) * envelope;
+                } else if (type === 'perc3') {
+                    // Conga - low drum-like
+                    const freqSweep = frequency * Math.exp(-t * 5);
+                    data[i] = Math.sin(2 * Math.PI * freqSweep * t) * envelope;
+                } else if (type === 'perc4') {
+                    // Woodblock - sharp attack
+                    const attack = Math.exp(-t * 50);
+                    data[i] = Math.sin(2 * Math.PI * frequency * t) * envelope * attack;
+                } else if (type === 'perc5') {
+                    // Tambourine - jingling
+                    const jingle1 = Math.sin(2 * Math.PI * frequency * t);
+                    const jingle2 = Math.sin(2 * Math.PI * frequency * 1.3 * t) * 0.7;
+                    const jingle3 = Math.sin(2 * Math.PI * frequency * 1.6 * t) * 0.5;
+                    data[i] = (jingle1 + jingle2 + jingle3) * envelope * 0.3;
+                } else {
+                    data[i] = Math.sin(2 * Math.PI * frequency * t) * envelope;
+                }
             } else if (type.startsWith('tom')) {
                 const freqSweep = frequency * Math.exp(-t * 8);
                 data[i] = Math.sin(2 * Math.PI * freqSweep * t) * envelope;
             } else if (type.startsWith('fx')) {
-                const modulation = Math.sin(2 * Math.PI * 10 * t);
-                data[i] = Math.sin(2 * Math.PI * frequency * t * (1 + modulation * 0.5)) * envelope;
+                if (type === 'fx') {
+                    // Laser sweep - frequency sweep up
+                    const freqSweep = frequency * (1 + t * 8);
+                    data[i] = Math.sin(2 * Math.PI * freqSweep * t) * envelope;
+                } else if (type === 'fx2') {
+                    // Deep sweep - frequency sweep down
+                    const freqSweep = frequency * Math.exp(-t * 2);
+                    data[i] = Math.sin(2 * Math.PI * freqSweep * t) * envelope;
+                } else if (type === 'fx3') {
+                    // Sharp stab - short noise burst
+                    data[i] = (Math.random() * 2 - 1) * envelope * Math.exp(-t * 20);
+                } else if (type === 'fx4') {
+                    // High noise - filtered noise
+                    const noise = (Math.random() * 2 - 1) * envelope;
+                    const filter = Math.exp(-t * 50); // High frequency filter
+                    data[i] = noise * filter;
+                } else if (type === 'fx5') {
+                    // Bell-like - harmonic series
+                    let sample = 0;
+                    for (let h = 1; h <= 5; h++) {
+                        sample += Math.sin(2 * Math.PI * frequency * h * t) / h;
+                    }
+                    data[i] = sample * envelope * 0.2;
+                } else {
+                    const modulation = Math.sin(2 * Math.PI * 10 * t);
+                    data[i] = Math.sin(2 * Math.PI * frequency * t * (1 + modulation * 0.5)) * envelope;
+                }
             } else {
                 data[i] = Math.sin(2 * Math.PI * frequency * t) * envelope;
             }
@@ -396,6 +514,11 @@ class DrumMachine {
         source.connect(gainNode);
         gainNode.connect(this.audioContext.destination);
         source.start(0);
+    }
+    
+    // Toggle mute state for a channel
+    toggleMute(channel) {
+        this.mutedChannels[channel] = !this.mutedChannels[channel];
     }
     
     // Toggle pad state
@@ -510,7 +633,7 @@ class DrumMachine {
         // Play sounds and highlight active pads
         for (let channel = 0; channel < this.channels; channel++) {
             // Check if this step is active in the current playing block
-            if (this.sequence[blockIndex][channel][stepInBlock]) {
+            if (this.sequence[blockIndex][channel][stepInBlock] && !this.mutedChannels[channel]) {
                 const soundName = this.soundMap[channel];
                 this.playSound(soundName);
                 
