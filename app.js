@@ -264,8 +264,8 @@ class DrumMachine {
     async initAudio() {
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
-        // Lista de sons a generar (per defecte generarem sons sintètics)
-        // L'usuari podrà substituir-los pels seus propis fitxers
+        // List of sounds to generate (by default we will generate synthetic sounds)
+        // The user will be able to replace them with their own files
         const sounds = [
             'kick', 'kick2', 'kick3', 'kick4', 'kick5',
             'snare', 'snare2', 'snare3', 'snare4', 'snare5',

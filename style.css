@@ -18,6 +18,10 @@ body {
 .container {
     width: 100%;
     max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .drum-machine {
@@ -527,4 +531,30 @@ body {
     .pad {
         border-radius: 4px;
     }
+}
+
+/* Footer Styles */
+.footer {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border-top: 1px solid #667eea;
+    margin-top: 20px;
+}
+
+.footer p {
+    margin: 0;
+    color: #a0aec0;
+    font-size: 14px;
+}
+
+.footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #7c3aed;
 }
