@@ -1,6 +1,8 @@
 # DrumNova - Redrum-Style Drum Machine
 
-An interactive rhythm machine inspired by Redrum, fully functional in the browser.
+🌐 **[Try the live demo](https://drumnova.oscarperiche.com)**
+
+A personal experiment building an interactive drum machine inspired by Redrum, fully functional in the browser. This is just a fun side project to explore the Web Audio API and create something useful for making beats.
 
 ## 🎵 Features
 
@@ -156,14 +158,7 @@ myNewPattern: {
 }
 ```
 
-## 🚧 Future Enhancements (Ready to Implement)
-
-### Backend with PHP/Laravel (Optional)
-If you want to add server functionality:
-- Dynamic sound library management
-- Save patterns to database
-- Share patterns between users
-- Authentication and user profiles
+## 🚧 Future Ideas (Maybe Someday)
 
 ### Possible Extensions
 - ✅ Export/Import patterns (already implemented at JS level)
@@ -180,35 +175,14 @@ If you want to add server functionality:
 
 ## 📝 License & Contributing
 
-This project is open source and free to use, modify, and distribute. If you create improvements, fixes, or new features, please consider sharing them back with the community through GitHub issues or pull requests.
+This is a personal project shared under the MIT License - feel free to use it, modify it, or learn from it however you want.
 
-### How to Contribute
-- **Report bugs**: Use GitHub Issues to report any problems you encounter
-- **Suggest features**: Open issues with feature requests or ideas
-- **Share your creations**: Post your patterns, modifications, or derivative works
-- **Contribute code**: Fork the repository and submit pull requests for improvements
+If you find bugs or have ideas to improve it, I'd love to hear about them! Open an issue or submit a pull request if you want to contribute. No formal process needed - this is just a casual project, so any feedback or improvements are welcome.
 
-### GitHub Repository Setup
-To make this project fully open source on GitHub:
+## 🎯 About
 
-1. **Enable Issues**: In repository settings, ensure "Issues" is enabled for bug reports and feature requests
-2. **Enable Discussions** (optional): For community conversations and sharing patterns
-3. **Add Topics**: Add relevant topics like `drum-machine`, `web-audio`, `javascript`, `music-production`
-4. **Create Labels**: Set up labels for issues (bug, enhancement, question, etc.)
-5. **Add License File**: Create a `LICENSE` file with MIT or similar permissive license
-6. **Add Contributing Guidelines**: Create `CONTRIBUTING.md` with development guidelines
+Made by Oscar Periche as a personal experiment to play with the Web Audio API and build something fun for making beats.
 
-### Repository Visibility & Restrictions
-- **Make it Public**: Set repository visibility to public so anyone can see and contribute
-- **No Code of Conduct Required**: For a small personal project, a simple contribution guideline is sufficient
-- **No Security Policy Needed**: Unless you plan to accept security reports
-- **Branch Protection**: Consider protecting the main branch to require pull request reviews for changes
-
-The goal is to create a welcoming space for music producers and developers to collaborate and share their drum machine creations!
-
-## 🎯 Credits
-
-Developed with passion for electronic music and clean code by Oscar Periche.
 Visit [oscarperiche.com](https://oscarperiche.com) to get to know me.
 
 ---
