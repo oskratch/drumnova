@@ -279,6 +279,11 @@ class DrumMachine {
                 }
             });
         });
+        
+        // Initialize mute button states
+        for (let i = 0; i < this.channels; i++) {
+            this.updateMuteUI(i);
+        }
     }
     
     // Initialize Web Audio API
@@ -519,6 +524,7 @@ class DrumMachine {
     // Toggle mute state for a channel
     toggleMute(channel) {
         this.mutedChannels[channel] = !this.mutedChannels[channel];
+        this.updateMuteUI(channel);
     }
     
     // Toggle pad state
@@ -534,6 +540,18 @@ class DrumMachine {
             pad.classList.add('active');
         } else {
             pad.classList.remove('active');
+        }
+    }
+    
+    // Update mute button visual state
+    updateMuteUI(channel) {
+        const muteBtn = document.querySelector(`[data-channel="${channel}"].mute-btn`);
+        if (this.mutedChannels[channel]) {
+            muteBtn.classList.add('muted');
+            muteBtn.textContent = '🔇';
+        } else {
+            muteBtn.classList.remove('muted');
+            muteBtn.textContent = '🔊';
         }
     }
     
