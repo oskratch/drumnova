@@ -145,8 +145,11 @@ In `app.js`, inside `this.demoPatterns`, add:
 ```javascript
 myNewPattern: {
     name: 'My Pattern Name',
+    bpm: 120,                     // Recommended BPM
+    blocks: 1,                    // 1, 2, 4, or 8 blocks
+    soundSelections: [0,0,0,0,0,0,0,0], // Sound variant index per channel (0-4)
     pattern: [
-        [1,0,0,0,...], // Kick (8 channels total now)
+        [1,0,0,0,...], // Kick (8 channels total)
         [0,0,1,0,...], // Snare
         [1,1,1,1,...], // HiHat
         [0,0,0,0,...], // Clap
@@ -158,6 +161,12 @@ myNewPattern: {
 }
 ```
 
+**Pattern metadata:**
+- `bpm`: Sets the tempo automatically when loaded
+- `blocks`: Number of blocks (1=16 steps, 2=32, 4=64, 8=128)
+- `soundSelections`: Array of 8 indices (0-4) to select which sound variant for each channel
+- `pattern`: 2D array - 8 rows (channels) × steps (16 per block)
+
 ## 🚧 Future Ideas (Maybe Someday)
 
 ### Possible Extensions
@@ -165,10 +174,10 @@ myNewPattern: {
 - ✅ 8 channels with multiple sound variations
 - ✅ Block system (1/2/4/8 blocks = up to 128 steps)
 - ✅ Mute/Solo per channel (mute implemented)
+- ✅ Volume control per channel
 - ⬜ Save to browser localStorage
 - ⬜ Copy/paste blocks
 - ⬜ Effects (reverb, delay, filter)
-- ⬜ Volume control per channel
 - ⬜ Swing/Shuffle
 - ⬜ Step subdivision (32 steps)
 - ⬜ MIDI sync/export

@@ -31,10 +31,13 @@ class DrumMachine {
         this.audioContext = null;
         this.audioBuffers = {};
         
-        // Demo patterns (updated for 8 channels)
+        // Demo patterns (updated for 8 channels with BPM and sound selections)
         this.demoPatterns = {
             basic: {
                 name: 'Rock Steady',
+                bpm: 120,
+                blocks: 1,
+                soundSelections: [0, 0, 0, 0, 0, 0, 0, 0], // Index of sound for each channel (0 = first option)
                 pattern: [
                     [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], // Kick - steady 4/4
                     [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare - backbeat
@@ -48,6 +51,9 @@ class DrumMachine {
             },
             funk: {
                 name: 'Funk Soul',
+                bpm: 105,
+                blocks: 1,
+                soundSelections: [0, 1, 0, 0, 0, 1, 0, 0], // Using some vintage sounds
                 pattern: [
                     [1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0], // Kick - syncopated
                     [0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0], // Snare - ghost notes
@@ -61,6 +67,9 @@ class DrumMachine {
             },
             hiphop: {
                 name: 'Boom Bap',
+                bpm: 90,
+                blocks: 1,
+                soundSelections: [0, 3, 0, 0, 0, 0, 0, 0], // Tight snare
                 pattern: [
                     [1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0], // Kick - boom bap
                     [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare - tight
@@ -74,8 +83,11 @@ class DrumMachine {
             },
             techno: {
                 name: 'Industrial Pulse',
+                bpm: 135,
+                blocks: 2,
+                soundSelections: [2, 0, 0, 0, 0, 0, 0, 0], // Electro kick
                 pattern: [
-                    // Block 1 - Build up
+                    // Block 1 + 2 (32 steps)
                     [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0, 1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
                     [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -88,6 +100,9 @@ class DrumMachine {
             },
             bluemonday: {
                 name: 'New Wave Icon',
+                bpm: 128,
+                blocks: 1,
+                soundSelections: [3, 0, 0, 0, 0, 0, 0, 0], // Deep kick
                 pattern: [
                     [1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // Kick - iconic pattern
                     [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare - steady
@@ -101,6 +116,9 @@ class DrumMachine {
             },
             house: {
                 name: 'Four to the Floor',
+                bpm: 124,
+                blocks: 1,
+                soundSelections: [0, 0, 1, 0, 0, 0, 0, 0], // Open hihat
                 pattern: [
                     [1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0], // Kick - four to floor
                     [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare - backbeat
@@ -114,6 +132,9 @@ class DrumMachine {
             },
             build: {
                 name: 'Tension Build',
+                bpm: 130,
+                blocks: 1,
+                soundSelections: [0, 0, 1, 0, 0, 0, 0, 0],
                 pattern: [
                     [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0], // Kick - steady
                     [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0], // Snare - basic
@@ -127,6 +148,9 @@ class DrumMachine {
             },
             complex: {
                 name: 'Poly Rhythm',
+                bpm: 115,
+                blocks: 1,
+                soundSelections: [0, 0, 0, 2, 0, 0, 0, 0], // Echo clap
                 pattern: [
                     [1,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0], // Kick - syncopated
                     [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1], // Snare - ghost + accent
@@ -154,8 +178,23 @@ class DrumMachine {
     
     async init() {
         this.createGrid();
+        this.populatePatternSelector();
         this.setupEventListeners();
         await this.initAudio();
+    }
+    
+    // Populate pattern selector dropdown from demoPatterns
+    populatePatternSelector() {
+        const select = document.getElementById('patternSelect');
+        select.innerHTML = '<option value="">-- Select Pattern --</option>';
+        
+        Object.keys(this.demoPatterns).forEach(key => {
+            const pattern = this.demoPatterns[key];
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = `${pattern.name} (${pattern.bpm} BPM)`;
+            select.appendChild(option);
+        });
     }
     
     // Create the sequencer grid
@@ -774,6 +813,28 @@ class DrumMachine {
         const pattern = this.demoPatterns[patternKey];
         if (!pattern) return;
 
+        // Apply BPM from pattern
+        if (pattern.bpm) {
+            this.bpm = pattern.bpm;
+            document.getElementById('bpmValue').textContent = this.bpm;
+            document.getElementById('bpmSlider').value = this.bpm;
+        }
+
+        // Apply sound selections for each channel
+        if (pattern.soundSelections) {
+            pattern.soundSelections.forEach((soundIndex, channel) => {
+                const selector = document.querySelectorAll('.sound-selector')[channel];
+                if (selector) {
+                    selector.selectedIndex = soundIndex;
+                }
+            });
+        }
+
+        // Set block count to pattern's requirement
+        if (pattern.blocks && pattern.blocks !== this.totalBlocks) {
+            this.setTotalBlocks(pattern.blocks);
+        }
+
         // Clear all active blocks
         for (let blockIndex = 0; blockIndex < this.totalBlocks; blockIndex++) {
             this.sequence[blockIndex] = Array(this.channels).fill(null).map(() => Array(this.steps).fill(false));
@@ -782,11 +843,6 @@ class DrumMachine {
         // Calculate how many blocks this pattern spans
         const patternSteps = pattern.pattern[0].length; // Assume all channels have same length
         const blocksNeeded = Math.ceil(patternSteps / this.steps);
-
-        // If pattern is longer than available blocks, expand to fit
-        if (blocksNeeded > this.totalBlocks) {
-            this.setTotalBlocks(Math.min(blocksNeeded, 8)); // Max 8 blocks
-        }
 
         // Load pattern across blocks
         for (let blockIndex = 0; blockIndex < this.totalBlocks; blockIndex++) {
@@ -808,7 +864,7 @@ class DrumMachine {
         // Update UI for current block
         this.updateBlockDisplay();
 
-        console.log(`Loaded pattern "${pattern.name}" (${patternSteps} steps) into ${this.totalBlocks} blocks`);
+        console.log(`Loaded pattern "${pattern.name}" at ${pattern.bpm} BPM (${patternSteps} steps, ${pattern.blocks} blocks)`);
     }
     
     // Export pattern (for future save functionality)
