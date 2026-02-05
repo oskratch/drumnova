@@ -294,7 +294,7 @@ body {
 }
 
 .label-header {
-    height: 41px;
+    height: 42px;
     display: flex;
     align-items: center;
     font-size: 12px;
@@ -312,7 +312,7 @@ body {
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     /* Match the height of grid rows - will be set by grid auto-sizing */
-    min-height:68px;
+    min-height:63px;
 }
 
 .label-content {
@@ -412,6 +412,40 @@ body {
     background: linear-gradient(145deg, #c53030, #9b2c2c);
     border-color: #fc8181;
     box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
+}
+
+.volume-dial {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    margin-right: 8px;
+    user-select: none;
+    transition: transform 0.1s ease;
+}
+
+.volume-dial:hover {
+    transform: scale(1.1);
+}
+
+.volume-dial:active {
+    transform: scale(0.95);
+}
+
+.volume-dial svg {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.volume-dial circle {
+    transition: stroke 0.2s ease;
+}
+
+.volume-dial:hover circle {
+    stroke: #7c3aed;
+}
+
+.dial-indicator {
+    transform-origin: 15px 15px;
+    transition: transform 0.1s ease;
 }
 
 .grid-container {

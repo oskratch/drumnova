@@ -24,6 +24,9 @@ class DrumMachine {
         // Mute state for each channel
         this.mutedChannels = [false, false, false, false, false, false, false, false];
         
+        // Volume for each channel (0.0 to 1.0)
+        this.channelVolumes = [0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7];
+        
         // Audio context and buffers
         this.audioContext = null;
         this.audioBuffers = {};
@@ -253,7 +256,7 @@ class DrumMachine {
                 const channel = parseInt(e.target.dataset.channel);
                 const selector = document.querySelector(`.sound-selector[data-channel="${channel}"]`);
                 const soundName = selector.value;
-                this.playSound(soundName);
+                this.playSound(soundName, channel);
                 
                 // Visual feedback
                 e.target.style.transform = 'scale(0.9)';
@@ -284,6 +287,74 @@ class DrumMachine {
         for (let i = 0; i < this.channels; i++) {
             this.updateMuteUI(i);
         }
+        
+        // Volume dials
+        this.initVolumeDials();
+    }
+    
+    initVolumeDials() {
+        const dials = document.querySelectorAll('.volume-dial');
+        
+        dials.forEach(dial => {
+            const channel = parseInt(dial.dataset.channel);
+            const indicator = dial.querySelector('.dial-indicator');
+            let isDragging = false;
+            let startY = 0;
+            let startVolume = 0;
+            
+            // Initialize dial rotation based on current volume
+            this.updateDialRotation(channel);
+            
+            const onMouseDown = (e) => {
+                isDragging = true;
+                startY = e.clientY || e.touches[0].clientY;
+                startVolume = this.channelVolumes[channel];
+                e.preventDefault();
+            };
+            
+            const onMouseMove = (e) => {
+                if (!isDragging) return;
+                
+                const clientY = e.clientY || e.touches[0].clientY;
+                const deltaY = startY - clientY; // Inverted: up = increase
+                const volumeChange = deltaY / 100; // Sensitivity
+                
+                // Update volume (clamped between 0 and 1)
+                this.channelVolumes[channel] = Math.max(0, Math.min(1, startVolume + volumeChange));
+                this.updateDialRotation(channel);
+                
+                e.preventDefault();
+            };
+            
+            const onMouseUp = () => {
+                isDragging = false;
+            };
+            
+            // Mouse events
+            dial.addEventListener('mousedown', onMouseDown);
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            
+            // Touch events
+            dial.addEventListener('touchstart', onMouseDown);
+            document.addEventListener('touchmove', onMouseMove);
+            document.addEventListener('touchend', onMouseUp);
+        });
+    }
+    
+    updateDialRotation(channel) {
+        const dial = document.querySelector(`.volume-dial[data-channel="${channel}"]`);
+        if (!dial) return;
+        
+        const indicator = dial.querySelector('.dial-indicator');
+        const volume = this.channelVolumes[channel];
+        
+        // Rotate from -135° (min) to +135° (max)
+        const rotation = (volume * 270) - 135;
+        indicator.style.transform = `rotate(${rotation}deg)`;
+        
+        // Update title to show percentage
+        dial.title = `Volume: ${Math.round(volume * 100)}%`;
     }
     
     // Initialize Web Audio API
@@ -504,7 +575,7 @@ class DrumMachine {
     }
     
     // Play a sound
-    playSound(soundName) {
+    playSound(soundName, channel = null) {
         if (!this.audioBuffers[soundName]) {
             console.warn(`Sound not found: ${soundName}`);
             return;
@@ -514,7 +585,13 @@ class DrumMachine {
         source.buffer = this.audioBuffers[soundName];
         
         const gainNode = this.audioContext.createGain();
-        gainNode.gain.value = 0.7;
+        
+        // Apply channel volume if specified, otherwise use default
+        if (channel !== null && this.channelVolumes[channel] !== undefined) {
+            gainNode.gain.value = this.channelVolumes[channel];
+        } else {
+            gainNode.gain.value = 0.7;
+        }
         
         source.connect(gainNode);
         gainNode.connect(this.audioContext.destination);
@@ -653,7 +730,7 @@ class DrumMachine {
             // Check if this step is active in the current playing block
             if (this.sequence[blockIndex][channel][stepInBlock] && !this.mutedChannels[channel]) {
                 const soundName = this.soundMap[channel];
-                this.playSound(soundName);
+                this.playSound(soundName, channel);
                 
                 // Only show visual feedback if viewing the playing block
                 if (shouldShowVisual) {
