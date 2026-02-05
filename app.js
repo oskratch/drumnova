@@ -281,6 +281,24 @@ class DrumMachine {
             }
         });
         
+        // Save pattern to file
+        document.getElementById('savePattern').addEventListener('click', () => {
+            this.savePatternToFile();
+        });
+        
+        // Load pattern from file
+        document.getElementById('loadFile').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+        
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                this.loadPatternFromFile(file);
+                e.target.value = ''; // Reset input
+            }
+        });
+        
         // Sound selectors
         document.querySelectorAll('.sound-selector').forEach(selector => {
             selector.addEventListener('change', (e) => {
@@ -874,11 +892,50 @@ class DrumMachine {
             bpm: this.bpm,
             totalBlocks: this.totalBlocks,
             soundMap: [...this.soundMap],
+            channelVolumes: [...this.channelVolumes],
+            mutedChannels: [...this.mutedChannels],
             // Only export active blocks
             pattern: this.sequence.slice(0, this.totalBlocks).map(block =>
                 block.map(channel => channel.map(step => step ? 1 : 0))
             )
         };
+    }
+    
+    // Save pattern to file
+    savePatternToFile() {
+        const pattern = this.exportPattern();
+        const timestamp = new Date().toISOString().slice(0,19).replace(/:/g,'-');
+        const filename = `drumnova-pattern-${timestamp}.json`;
+        
+        const json = JSON.stringify(pattern, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        
+        URL.revokeObjectURL(url);
+        console.log(`Pattern saved as ${filename}`);
+    }
+    
+    // Load pattern from file
+    loadPatternFromFile(file) {
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+            try {
+                const patternData = JSON.parse(e.target.result);
+                this.importPattern(patternData);
+                console.log(`Pattern loaded from ${file.name}`);
+            } catch (error) {
+                console.error('Error loading pattern:', error);
+                alert('Invalid pattern file. Please select a valid DrumNova pattern.');
+            }
+        };
+        
+        reader.readAsText(file);
     }
     
     // Import pattern (for future load functionality)
@@ -899,6 +956,22 @@ class DrumMachine {
             document.querySelectorAll('.sound-selector').forEach((selector, index) => {
                 selector.value = this.soundMap[index];
             });
+        }
+        
+        if (patternData.channelVolumes) {
+            this.channelVolumes = [...patternData.channelVolumes];
+            // Update volume dials
+            for (let i = 0; i < this.channels; i++) {
+                this.updateDialRotation(i);
+            }
+        }
+        
+        if (patternData.mutedChannels) {
+            this.mutedChannels = [...patternData.mutedChannels];
+            // Update mute buttons
+            for (let i = 0; i < this.channels; i++) {
+                this.updateMuteUI(i);
+            }
         }
         
         if (patternData.pattern) {

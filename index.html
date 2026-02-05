@@ -19,6 +19,26 @@
                 </div>
             </div>
 
+            <!-- Pattern Management Row -->
+            <div class="pattern-row">
+                <!-- Save/Load Pattern Section -->
+                <div class="save-load-section">
+                    <label>Pattern:</label>
+                    <button id="savePattern" class="btn btn-secondary">💾 Save</button>
+                    <button id="loadFile" class="btn btn-secondary">📁 Load</button>
+                    <input type="file" id="fileInput" accept=".json,.drumnova" style="display: none;">
+                </div>
+
+                <!-- Demo Patterns Section -->
+                <div class="pattern-section">
+                    <label for="patternSelect">Demo Patterns:</label>
+                    <select id="patternSelect">
+                        <!-- Populated dynamically from JS -->
+                    </select>
+                    <button id="loadPattern" class="btn btn-secondary">Load</button>
+                </div>
+            </div>
+
             <!-- BPM Control -->
             <div class="bpm-section">
                 <label for="bpmSlider">BPM: <span id="bpmValue">120</span></label>
@@ -39,15 +59,6 @@
                     <span id="blockIndicator">Block 1/1</span>
                     <button id="nextBlock" class="nav-btn">►</button>
                 </div>
-            </div>
-
-            <!-- Pattern Selector -->
-            <div class="pattern-section">
-                <label for="patternSelect">Demo Patterns:</label>
-                <select id="patternSelect">
-                    <!-- Populated dynamically from JS -->
-                </select>
-                <button id="loadPattern" class="btn btn-secondary">Load Pattern</button>
             </div>
 
             <!-- Sequencer Grid -->

@@ -14,10 +14,12 @@ A personal experiment building an interactive drum machine inspired by Redrum, f
 - **8 instrument channels**: Kick, Snare, HiHat, Clap, Tom, Perc, Cymbal, FX
 - **Multiple sound variations**: 4-5 different sounds per instrument with enhanced variety
 - **Mute buttons**: 🔊/🔇 per channel to silence individual instruments
+- **Volume dials**: Individual volume control per channel with rotary knobs
 - **BPM control** adjustable (60-200 BPM)
+- **Save/Load patterns**: Download and upload your patterns as JSON files
+- **Responsive design**: Works on desktop, tablet, and mobile with horizontal scroll
 - **Visual interface** hardware-style with responsive colors
 - **Web Audio API** for low-latency audio playback
-- **Export/Import patterns** (ready for future features)
 
 ## 🚀 Quick Start
 
@@ -43,8 +45,10 @@ A personal experiment building an interactive drum machine inspired by Redrum, f
 - **BPM Slider**: Adjust speed (60-200 BPM)
 - **Sound selectors**: Choose different sounds for each instrument (4-5 variations each)
 - **Mute buttons**: 🔊/🔇 per channel to silence individual instruments during playback
+- **Volume dials**: Drag to adjust individual channel volume (0-100%)
 - **▶ Preview buttons**: Test individual instrument sounds (plays currently selected variant)
-- **Demo Patterns**: Load pre-recorded bases into current block
+- **💾 Save / 📁 Load**: Save your pattern to a file or load a previously saved pattern
+- **Demo Patterns**: Load pre-configured demo patterns to get started
 - **Block buttons (1/2/4/8)**: Set how many blocks are active
 - **◄ ► Navigation**: Switch between blocks to edit different sections
 
@@ -102,7 +106,19 @@ DrumNova/
 
 ## 💾 Saving and Loading Patterns
 
-### Export your current pattern
+### Using the UI (Recommended)
+
+- Click **💾 Save** to download your current pattern as a JSON file
+- Click **📁 Load** to upload a previously saved pattern file
+
+The saved file includes:
+- Your pattern sequence (all blocks)
+- BPM setting
+- Sound selections for each channel
+- Volume levels per channel
+- Mute states
+
+### Using JavaScript (Advanced)
 
 ```javascript
 const myPattern = drumMachine.exportPattern();

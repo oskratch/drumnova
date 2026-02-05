@@ -251,19 +251,28 @@ body {
     align-items: center;
     gap: 10px;
     margin-bottom: 25px;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    flex-wrap: wrap;
 }
 
 .pattern-section label {
-    font-weight: bold;
-    font-size: 14px;
+    font-weight: normal;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.pattern-section .separator {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 18px;
+    padding: 0 5px;
 }
 
 #patternSelect {
     flex: 1;
+    min-width: 200px;
     padding: 8px 12px;
     background: #2a2a3e;
     border: 2px solid #3a3a4e;
@@ -277,6 +286,34 @@ body {
 #patternSelect:focus {
     outline: none;
     border-color: #667eea;
+}
+
+/* Pattern Row - Contains Save/Load and Demo Patterns side by side */
+.pattern-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.pattern-row > div {
+    flex: 1;
+    margin-bottom: 0; /* Remove individual margins, row controls spacing */
+}
+
+/* Save/Load Section */
+.save-load-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: linear-gradient(145deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.1));
+    border-radius: 10px;
+    border: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+.save-load-section .btn {
+    color: #fff !important;
 }
 
 /* Sequencer */
@@ -632,4 +669,260 @@ body {
 
 .footer a:hover {
     color: #7c3aed;
+}
+
+/* =============================================
+   RESPONSIVE DESIGN - Mobile & Tablet
+   ============================================= */
+
+/* Tablets and below (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .drum-machine {
+        padding: 20px;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .logo {
+        font-size: 2em;
+    }
+    
+    .tagline {
+        font-size: 12px;
+    }
+    
+    /* Stack controls vertically */
+    .controls {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .bpm-section,
+    .block-section,
+    .save-load-section,
+    .pattern-section {
+        width: 100%;
+    }
+    
+    .pattern-section {
+        justify-content: center;
+    }
+    
+    .pattern-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+/* Mobile devices (max-width: 768px) */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .drum-machine {
+        padding: 15px;
+        border-radius: 15px;
+    }
+    
+    .logo {
+        font-size: 1.5em;
+    }
+    
+    /* Horizontal scroll for sequencer */
+    .sequencer {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+    }
+    
+    /* Reduce channel labels size */
+    .channel-labels {
+        min-width: 140px;
+        gap: 4px;
+    }
+    
+    .channel-label {
+        padding: 6px;
+        gap: 6px;
+    }
+    
+    .instrument-name {
+        font-size: 11px;
+    }
+    
+    .sound-selector {
+        font-size: 10px;
+        padding: 3px 5px;
+    }
+    
+    .preview-btn,
+    .mute-btn {
+        font-size: 12px;
+        padding: 4px 6px;
+        min-width: 28px;
+        height: 28px;
+    }
+    
+    .volume-dial svg {
+        width: 24px;
+        height: 24px;
+    }
+    
+    /* Smaller pads but still tappable */
+    .sequencer-grid {
+        min-width: 400px; /* Force horizontal scroll */
+        gap: 3px;
+    }
+    
+    .channel-row {
+        gap: 3px;
+    }
+    
+    .pad {
+        width: 22px;
+        height: 22px;
+        border-radius: 3px;
+    }
+    
+    /* Smaller buttons */
+    .btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .block-btn,
+    .nav-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-width: 35px;
+    }
+    
+    /* Stack block navigation */
+    .block-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .block-buttons {
+        justify-content: center;
+    }
+    
+    .block-navigation {
+        justify-content: center;
+    }
+    
+    /* Pattern section stacked */
+    .pattern-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .pattern-section label {
+        text-align: center;
+    }
+    
+    .pattern-section .separator {
+        display: none;
+    }
+    
+    #patternSelect {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .pattern-section .btn {
+        width: 100%;
+    }
+    
+    /* Save/Load section stacked */
+    .save-load-section {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .save-load-section label {
+        text-align: center;
+    }
+    
+    /* BPM slider */
+    #bpmSlider {
+        width: 100%;
+    }
+    
+    /* Footer */
+    .footer {
+        padding: 15px 10px;
+        font-size: 12px;
+    }
+}
+
+/* Small mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    .logo {
+        font-size: 1.3em;
+    }
+    
+    .tagline {
+        font-size: 10px;
+    }
+    
+    .drum-machine {
+        padding: 10px;
+    }
+    
+    /* Even smaller pads */
+    .pad {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .sequencer-grid {
+        min-width: 350px;
+        gap: 2px;
+    }
+    
+    .channel-row {
+        gap: 2px;
+    }
+    
+    .channel-labels {
+        min-width: 120px;
+        gap: 3px;
+    }
+    
+    .channel-label {
+        padding: 4px;
+        gap: 4px;
+    }
+    
+    .instrument-name {
+        font-size: 10px;
+    }
+    
+    .sound-selector {
+        font-size: 9px;
+    }
+    
+    .btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    /* Scroll hint */
+    .sequencer::after {
+        content: '← Swipe to scroll →';
+        display: block;
+        text-align: center;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: 8px;
+        font-style: italic;
+    }
 }
