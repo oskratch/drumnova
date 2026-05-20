@@ -35,6 +35,10 @@ class DrumMachine {
         this.audioContext = null;
         this.audioBuffers = {};
         this.masterCompressor = null; // Master bus compressor
+        this.reverbNode = null; // Reverb convolver
+        this.reverbGain = null; // Reverb send amount
+        this.dryGain = null; // Dry signal
+        this.reverbSend = 0; // 0-100%
         
         // Demo patterns (updated for 8 channels with BPM and sound selections)
         this.demoPatterns = {
@@ -335,6 +339,35 @@ class DrumMachine {
             }
         });
         
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tabId = e.target.dataset.tab;
+                
+                // Remove active from all tabs and content
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active to clicked tab and corresponding content
+                e.target.classList.add('active');
+                document.getElementById(`tab-${tabId}`).classList.add('active');
+            });
+        });
+        
+        // Reverb slider
+        const reverbSlider = document.getElementById('reverbSend');
+        reverbSlider.addEventListener('input', (e) => {
+            this.reverbSend = parseInt(e.target.value);
+            document.getElementById('reverbValue').textContent = this.reverbSend;
+            
+            // Update reverb/dry mix (equal power crossfade)
+            const wetGain = this.reverbSend / 100;
+            const dryGain = 1 - (wetGain * 0.5); // Reduce dry less aggressively
+            
+            this.reverbGain.gain.setValueAtTime(wetGain * 0.8, this.audioContext.currentTime);
+            this.dryGain.gain.setValueAtTime(dryGain, this.audioContext.currentTime);
+        });
+        
         // Sound selectors
         document.querySelectorAll('.sound-selector').forEach(selector => {
             selector.addEventListener('change', (e) => {
@@ -536,6 +569,23 @@ class DrumMachine {
         this.masterCompressor.release.setValueAtTime(0.05, this.audioContext.currentTime); // 50ms - quick release
         this.masterCompressor.connect(this.audioContext.destination);
         
+        // Create reverb (convolution reverb with synthetic impulse response)
+        this.reverbNode = this.audioContext.createConvolver();
+        this.reverbNode.buffer = this.createReverbImpulse(2, 2, false); // 2 seconds, sample rate, reverse
+        
+        // Create dry/wet gain nodes
+        this.dryGain = this.audioContext.createGain();
+        this.reverbGain = this.audioContext.createGain();
+        this.reverbGain.gain.value = 0; // Start with 0% reverb
+        this.dryGain.gain.value = 1; // Start with 100% dry
+        
+        // Connect reverb chain: reverb -> reverbGain -> compressor
+        this.reverbNode.connect(this.reverbGain);
+        this.reverbGain.connect(this.masterCompressor);
+        
+        // Dry signal goes straight to compressor
+        this.dryGain.connect(this.masterCompressor);
+        
         // List of sounds to generate (by default we will generate synthetic sounds)
         // The user will be able to replace them with their own files
         const sounds = [
@@ -557,6 +607,38 @@ class DrumMachine {
         console.log('Audio system initialized. Ready to load custom sounds.');
     }
     
+    // Create reverb impulse response (synthetic room reverb)
+    createReverbImpulse(duration, sampleRate, reverse) {
+        const length = sampleRate * duration;
+        const impulse = this.audioContext.createBuffer(2, length, sampleRate);
+        const impulseL = impulse.getChannelData(0);
+        const impulseR = impulse.getChannelData(1);
+        
+        for (let i = 0; i < length; i++) {
+            // Exponential decay for natural reverb tail
+            const decay = Math.exp(-3 * i / length);
+            
+            // Add some early reflections (first 10% of impulse)
+            let earlyReflection = 0;
+            if (i < length * 0.1) {
+                const reflectionPattern = [0.02, 0.05, 0.08, 0.12, 0.15]; // Reflection times
+                for (let r = 0; r < reflectionPattern.length; r++) {
+                    if (Math.abs(i / length - reflectionPattern[r]) < 0.005) {
+                        earlyReflection += (Math.random() * 2 - 1) * 0.5;
+                    }
+                }
+            }
+            
+            // Diffuse reverb tail (random noise with decay)
+            const diffuse = (Math.random() * 2 - 1) * decay;
+            
+            impulseL[i] = (diffuse + earlyReflection) * 0.5;
+            impulseR[i] = (diffuse + earlyReflection * 0.8) * 0.5; // Slightly different for stereo
+        }
+        
+        return impulse;
+    }
+    
     // Create synthetic sounds (placeholder - users can replace with their own samples)
     createSyntheticSound(type) {
         const sampleRate = this.audioContext.sampleRate;
@@ -565,14 +647,28 @@ class DrumMachine {
         // Diferents paràmetres segons el tipus de so
         if (type.startsWith('kick')) {
             duration = 0.5;
-            const variants = { kick: 150, kick2: 100, kick3: 180, kick4: 120, kick5: 160 };
-            frequency = variants[type] || 150;
-            decay = 0.3;
+            const variants = { 
+                kick: { freq: 60, decay: 0.5, pitchDecay: 18 },     // 808-style deep
+                kick2: { freq: 80, decay: 0.35, pitchDecay: 25 },   // Punchy
+                kick3: { freq: 50, decay: 0.6, pitchDecay: 15 },    // Sub bass
+                kick4: { freq: 70, decay: 0.4, pitchDecay: 20 },    // Balanced
+                kick5: { freq: 90, decay: 0.3, pitchDecay: 30 }     // Tight
+            };
+            const variant = variants[type] || variants.kick;
+            frequency = variant.freq;
+            decay = variant.decay;
         } else if (type.startsWith('snare')) {
-            duration = 0.3;
-            const variants = { snare: 200, snare2: 180, snare3: 220, snare4: 240, snare5: 190 };
-            frequency = variants[type] || 200;
-            decay = 0.2;
+            duration = 0.25;
+            const variants = { 
+                snare: { tone: 200, noise: 0.7, toneMix: 0.3, decay: 0.18, snap: 0.015 },      // 808 tight
+                snare2: { tone: 180, noise: 0.65, toneMix: 0.35, decay: 0.22, snap: 0.02 },    // Fat
+                snare3: { tone: 250, noise: 0.75, toneMix: 0.25, decay: 0.15, snap: 0.01 },    // Crisp
+                snare4: { tone: 150, noise: 0.6, toneMix: 0.4, decay: 0.25, snap: 0.025 },     // Deep
+                snare5: { tone: 220, noise: 0.8, toneMix: 0.2, decay: 0.12, snap: 0.008 }      // Sharp
+            };
+            const variant = variants[type] || variants.snare;
+            frequency = variant.tone;
+            decay = variant.decay;
         } else if (type.startsWith('hihat')) {
             const variants = { hihat: 0.1, hihat2: 0.3, hihat3: 0.15, hihat4: 0.08, hihat5: 0.12 };
             duration = variants[type] || 0.1;
@@ -631,12 +727,64 @@ class DrumMachine {
             const envelope = Math.exp(-t / decay);
             
             if (type.startsWith('kick')) {
-                const freqSweep = frequency * Math.exp(-t * 15);
-                data[i] = Math.sin(2 * Math.PI * freqSweep * t) * envelope;
+                // Get variant-specific parameters
+                const variants = { 
+                    kick: { freq: 60, decay: 0.5, pitchDecay: 18 },
+                    kick2: { freq: 80, decay: 0.35, pitchDecay: 25 },
+                    kick3: { freq: 50, decay: 0.6, pitchDecay: 15 },
+                    kick4: { freq: 70, decay: 0.4, pitchDecay: 20 },
+                    kick5: { freq: 90, decay: 0.3, pitchDecay: 30 }
+                };
+                const variant = variants[type] || variants.kick;
+                
+                // Pitch envelope for punch (starts high, drops fast)
+                const pitchEnv = Math.exp(-t * variant.pitchDecay);
+                const freqSweep = variant.freq * (1 + pitchEnv * 2);
+                
+                // Click attack for punch
+                const clickEnv = Math.exp(-t * 150);
+                const click = (Math.random() * 2 - 1) * clickEnv * 0.3;
+                
+                // Main sine wave
+                const sine = Math.sin(2 * Math.PI * freqSweep * t);
+                
+                // Sub harmonics for depth
+                const sub = Math.sin(2 * Math.PI * freqSweep * 0.5 * t) * 0.5;
+                
+                data[i] = (sine + sub + click) * envelope * 0.8;
+                
             } else if (type.startsWith('snare')) {
-                const noise = (Math.random() * 2 - 1) * 0.5;
-                const tone = Math.sin(2 * Math.PI * frequency * t) * 0.5;
-                data[i] = (noise + tone) * envelope;
+                // Get variant-specific parameters
+                const variants = { 
+                    snare: { tone: 200, noise: 0.7, toneMix: 0.3, decay: 0.18, snap: 0.015 },
+                    snare2: { tone: 180, noise: 0.65, toneMix: 0.35, decay: 0.22, snap: 0.02 },
+                    snare3: { tone: 250, noise: 0.75, toneMix: 0.25, decay: 0.15, snap: 0.01 },
+                    snare4: { tone: 150, noise: 0.6, toneMix: 0.4, decay: 0.25, snap: 0.025 },
+                    snare5: { tone: 220, noise: 0.8, toneMix: 0.2, decay: 0.12, snap: 0.008 }
+                };
+                const variant = variants[type] || variants.snare;
+                
+                // Noise component (white noise filtered)
+                const noise = (Math.random() * 2 - 1);
+                const noiseEnv = Math.exp(-t / variant.decay);
+                
+                // Tonal component with pitch envelope (808-style)
+                const pitchEnv = Math.exp(-t * 40);
+                const toneFreq = variant.tone * (1 + pitchEnv * 1.5);
+                const tone1 = Math.sin(2 * Math.PI * toneFreq * t);
+                const tone2 = Math.sin(2 * Math.PI * toneFreq * 1.6 * t) * 0.5; // Harmonic
+                const toneEnv = Math.exp(-t / (variant.decay * 1.2));
+                
+                // Snap/click attack
+                const snapEnv = Math.exp(-t / variant.snap);
+                const snap = (Math.random() * 2 - 1) * snapEnv * 0.4;
+                
+                // Mix components
+                const noisePart = noise * noiseEnv * variant.noise;
+                const tonePart = (tone1 + tone2) * toneEnv * variant.toneMix;
+                
+                data[i] = (noisePart + tonePart + snap) * 0.8;
+                
             } else if (type.startsWith('hihat') || type.startsWith('cymbal')) {
                 data[i] = (Math.random() * 2 - 1) * envelope;
             } else if (type.startsWith('clap')) {
@@ -770,8 +918,10 @@ class DrumMachine {
         // Multiply by velocity for dynamic range
         gainNode.gain.value = baseGain * velocity;
         
+        // Connect to both dry and reverb paths
         source.connect(gainNode);
-        gainNode.connect(this.masterCompressor); // Route through master compressor
+        gainNode.connect(this.dryGain); // Dry signal
+        gainNode.connect(this.reverbNode); // Wet signal through reverb
         
         // Start with swing delay (in seconds)
         const startTime = this.audioContext.currentTime + swingDelay;
@@ -1102,6 +1252,7 @@ class DrumMachine {
             name: 'Custom Pattern',
             bpm: this.bpm,
             swing: this.swing,
+            reverbSend: this.reverbSend,
             totalBlocks: this.totalBlocks,
             soundMap: [...this.soundMap],
             channelVolumes: [...this.channelVolumes],
@@ -1165,6 +1316,18 @@ class DrumMachine {
             this.swing = patternData.swing;
             document.getElementById('swingSlider').value = this.swing;
             document.getElementById('swingValue').textContent = this.swing;
+        }
+        
+        if (patternData.reverbSend !== undefined) {
+            this.reverbSend = patternData.reverbSend;
+            document.getElementById('reverbSend').value = this.reverbSend;
+            document.getElementById('reverbValue').textContent = this.reverbSend;
+            
+            // Update reverb/dry mix
+            const wetGain = this.reverbSend / 100;
+            const dryGain = 1 - (wetGain * 0.5);
+            this.reverbGain.gain.setValueAtTime(wetGain * 0.8, this.audioContext.currentTime);
+            this.dryGain.gain.setValueAtTime(dryGain, this.audioContext.currentTime);
         }
         
         if (patternData.totalBlocks) {

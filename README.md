@@ -8,13 +8,16 @@ A personal experiment building an interactive drum machine inspired by Redrum, f
 
 - **16 steps x 8 channels** sequencer grid with multi-block view (1/2/4 blocks visible at once)
 - **Block system**: Choose 1, 2, 4, or 8 blocks for extended patterns (up to 128 steps total)
+- **Tabbed interface**: Organized controls with BPM, SWING, PATTERN, and REVERB tabs to save vertical space
 - **Swing/Shuffle control**: Adjustable groove (0-75%) to add that human feel
 - **Velocity per pad**: Ghost notes, normal hits, and accents for dynamic expression
+- **Reverb effect**: Master reverb with send control (0-100%) for spatial depth
 - **Block navigation**: Switch between blocks to program different sections
 - **Seamless playback**: Play travels through all active blocks in sequence
 - **Demo patterns** preconfigured (Rock Steady, Funk Soul, Boom Bap, Industrial Pulse, New Wave Icon, Four to the Floor, Tension Build, Poly Rhythm)
 - **8 instrument channels**: Kick, Snare, HiHat, Clap, Tom, Perc, Cymbal, FX
-- **Multiple sound variations**: 4-5 different sounds per instrument with enhanced variety
+- **Multiple sound variations**: 4-5 different sounds per instrument with enhanced synthesis
+- **Improved synthesis**: 808-style kicks with pitch envelopes, realistic snares with noise/tone balance
 - **Mute buttons**: 🔊/🔇 per channel to silence individual instruments
 - **Volume dials**: Individual volume control per channel with rotary knobs
 - **BPM control** adjustable (60-200 BPM)
@@ -43,17 +46,25 @@ A personal experiment building an interactive drum machine inspired by Redrum, f
 - **Green/yellow pads** = currently playing
 
 ### Controls
+
+**Tabs**: Use the tab buttons to switch between different control sections:
+- **BPM Tab**: Adjust tempo (60-200 BPM)
+- **SWING Tab**: Add groove/shuffle (0-75%) + velocity tips
+- **PATTERN Tab**: Save/Load patterns and load demo patterns
+- **REVERB Tab**: Add spatial depth with reverb send (0-100%)
+
+**Main Controls**:
 - **Play/Pause**: Start or pause playback (shortcut: **Space**)
 - **Stop**: Stop and return to beginning (shortcut: **ESC**)
 - **Clear**: Erase current visible blocks' patterns (shortcut: **Ctrl+C**)
-- **BPM Slider**: Adjust speed (60-200 BPM)
-- **Swing Slider**: Add groove/shuffle (0-75%) - delays odd steps for human feel
+
+**Channel Controls**:
 - **Sound selectors**: Choose different sounds for each instrument (4-5 variations each)
 - **Mute buttons**: 🔊/🔇 per channel to silence individual instruments during playback (shortcuts: **1-8**)
 - **Volume dials**: Drag vertically to adjust individual channel volume (0-100%)
 - **▶ Preview buttons**: Test individual instrument sounds (plays currently selected variant)
-- **💾 Save / 📁 Load**: Save your pattern to a file or load a previously saved pattern (includes BPM, swing, volumes, mutes)
-- **Demo Patterns**: Load pre-configured demo patterns to get started
+
+**Block Controls**:
 - **Block buttons (1/2/4/8)**: Set how many blocks are active
 - **View buttons (1/2/4)**: Set how many blocks are visible at once (default: 2)
 - **◄ ► Navigation**: Switch between visible blocks (shortcuts: **Left/Right arrows**)
@@ -143,6 +154,7 @@ The saved file includes:
 - Your pattern sequence (all blocks) with velocity data per pad
 - BPM setting
 - Swing/shuffle amount
+- Reverb send amount
 - Sound selections for each channel
 - Volume levels per channel
 - Mute states
@@ -227,9 +239,13 @@ myNewPattern: {
 - ✅ Multi-block view (see 1/2/4 blocks at once)
 - ✅ Keyboard shortcuts for workflow
 - ✅ Master bus compression for professional sound
+- ✅ Reverb effect with send control
+- ✅ Improved drum synthesis (808-style kicks and snares)
+- ✅ Tabbed interface to save vertical space
 - ⬜ Save to browser localStorage
 - ⬜ Copy/paste blocks
-- ⬜ Reverb/delay effects
+- ⬜ Delay effect
+- ⬜ Per-channel EQ/filter
 - ⬜ Step subdivision (32 steps)
 - ⬜ MIDI sync/export
 

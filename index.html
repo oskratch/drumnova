@@ -12,15 +12,33 @@
             <!-- Header -->
             <div class="header">
                 <h1 class="logo">DrumNova</h1>
-                <div class="controls-top">
-                    <button id="playBtn" class="btn btn-play">▶ Play</button>
-                    <button id="stopBtn" class="btn btn-stop">■ Stop</button>
-                    <button id="clearBtn" class="btn btn-clear">Clear</button>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="tabs-navigation">
+                <button class="tab-btn active" data-tab="bpm">BPM</button>
+                <button class="tab-btn" data-tab="swing">SWING</button>
+                <button class="tab-btn" data-tab="pattern">PATTERN</button>
+                <button class="tab-btn" data-tab="reverb">REVERB</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content active" id="tab-bpm">
+                <div class="bpm-section">
+                    <label for="bpmSlider">BPM: <span id="bpmValue">120</span></label>
+                    <input type="range" id="bpmSlider" min="60" max="200" value="120" step="1">
                 </div>
             </div>
 
-            <!-- Pattern Management Row -->
-            <div class="pattern-row">
+            <div class="tab-content" id="tab-swing">
+                <div class="swing-section">
+                    <label for="swingSlider">Swing: <span id="swingValue">0</span>%</label>
+                    <input type="range" id="swingSlider" min="0" max="75" value="0" step="1">
+                    <div class="hint">💡 Tip: Click = normal | Shift+Click = accent | Alt+Click = ghost note</div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-pattern">
                 <!-- Save/Load Pattern Section -->
                 <div class="save-load-section">
                     <label>Pattern:</label>
@@ -39,17 +57,19 @@
                 </div>
             </div>
 
-            <!-- BPM Control -->
-            <div class="bpm-section">
-                <label for="bpmSlider">BPM: <span id="bpmValue">120</span></label>
-                <input type="range" id="bpmSlider" min="60" max="200" value="120" step="1">
+            <div class="tab-content" id="tab-reverb">
+                <div class="reverb-section">
+                    <label for="reverbSend">Reverb Send: <span id="reverbValue">0</span>%</label>
+                    <input type="range" id="reverbSend" min="0" max="100" value="0" step="1">
+                    <div class="hint">💡 Adds spatial depth to your drums</div>
+                </div>
             </div>
 
-            <!-- Swing Control -->
-            <div class="swing-section">
-                <label for="swingSlider">Swing: <span id="swingValue">0</span>%</label>
-                <input type="range" id="swingSlider" min="0" max="75" value="0" step="1">
-                <div class="hint">💡 Tip: Click = normal | Shift+Click = accent | Alt+Click = ghost note</div>
+            <!-- Controls -->
+            <div class="controls-main">
+                <button id="playBtn" class="btn btn-play">▶ Play</button>
+                <button id="stopBtn" class="btn btn-stop">■ Stop</button>
+                <button id="clearBtn" class="btn btn-clear">Clear</button>
             </div>
 
             <!-- Block Control -->
