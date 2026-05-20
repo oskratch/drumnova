@@ -536,28 +536,36 @@ body {
     flex-direction: column;
     gap: 2px;
     min-width: 200px;
+    /* Vertical alignment offset - adjust this value to fine-tune */
+    --vertical-offset: 10px;
+}
+
+.channel-labels > .channel-label:first-of-type {
+    margin-top: var(--vertical-offset);
 }
 
 .label-header {
-    height: 42px;
+    height: 32px;
     display: flex;
     align-items: center;
     font-size: 12px;
     font-weight: bold;
     color: #667eea;
     padding-left: 12px;
+    margin-bottom: 0;
 }
 
 .channel-label {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px;
+    padding: 4px 8px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    /* Match the height of grid rows - will be set by grid auto-sizing */
-    min-height:63px;
+    /* Match the exact height of grid rows */
+    min-height: 50px;
+    height: auto;
 }
 
 .label-content {
@@ -703,13 +711,16 @@ body {
 }
 
 .indicator-header {
-    height: 32px;
+    display: none; /* Hide to align numbers with INSTRUMENT title */
 }
 
 .step-numbers {
     display: grid;
     grid-template-columns: repeat(16, 1fr);
     gap: 2px;
+    height: 32px; /* Same as label-header */
+    align-items: center;
+    margin-bottom: 0;
 }
 
 .step-numbers span {
@@ -723,13 +734,15 @@ body {
     display: grid;
     grid-template-rows: repeat(8, 1fr);
     gap: 2px;
+    /* Vertical alignment offset - adjust this value to fine-tune */
+    margin-top: var(--vertical-offset, 12px);
 }
 
 .channel-row {
     display: grid;
     grid-template-columns: repeat(16, 1fr);
     gap: 2px;
-    min-height: 50px;
+    min-height: 51px;
 }
 
 /* Pads */

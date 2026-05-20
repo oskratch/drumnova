@@ -218,9 +218,22 @@ class DrumMachine {
         
         const totalVisibleSteps = this.steps * this.visibleBlocks;
         
+        // Update step indicators
+        const stepNumbers = document.querySelector('.step-numbers');
+        if (stepNumbers) {
+            stepNumbers.innerHTML = '';
+            stepNumbers.style.gridTemplateColumns = `repeat(${totalVisibleSteps}, 1fr)`;
+            for (let i = 1; i <= totalVisibleSteps; i++) {
+                const span = document.createElement('span');
+                span.textContent = i;
+                stepNumbers.appendChild(span);
+            }
+        }
+        
         for (let channel = 0; channel < this.channels; channel++) {
             const row = document.createElement('div');
             row.className = 'channel-row';
+            row.style.gridTemplateColumns = `repeat(${totalVisibleSteps}, 1fr)`;
             
             for (let step = 0; step < totalVisibleSteps; step++) {
                 const pad = document.createElement('button');
