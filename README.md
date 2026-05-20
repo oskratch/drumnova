@@ -6,8 +6,10 @@ A personal experiment building an interactive drum machine inspired by Redrum, f
 
 ## 🎵 Features
 
-- **16 steps x 8 channels** sequencer grid
+- **16 steps x 8 channels** sequencer grid with multi-block view (1/2/4 blocks visible at once)
 - **Block system**: Choose 1, 2, 4, or 8 blocks for extended patterns (up to 128 steps total)
+- **Swing/Shuffle control**: Adjustable groove (0-75%) to add that human feel
+- **Velocity per pad**: Ghost notes, normal hits, and accents for dynamic expression
 - **Block navigation**: Switch between blocks to program different sections
 - **Seamless playback**: Play travels through all active blocks in sequence
 - **Demo patterns** preconfigured (Rock Steady, Funk Soul, Boom Bap, Industrial Pulse, New Wave Icon, Four to the Floor, Tension Build, Poly Rhythm)
@@ -16,7 +18,9 @@ A personal experiment building an interactive drum machine inspired by Redrum, f
 - **Mute buttons**: 🔊/🔇 per channel to silence individual instruments
 - **Volume dials**: Individual volume control per channel with rotary knobs
 - **BPM control** adjustable (60-200 BPM)
-- **Save/Load patterns**: Download and upload your patterns as JSON files
+- **Keyboard shortcuts**: Space = play/pause, ESC = stop, 1-8 = mute channels, arrows = navigate blocks
+- **Master bus compressor**: Professional sound cohesion and punch
+- **Save/Load patterns**: Download and upload your patterns as JSON files with all settings preserved
 - **Responsive design**: Works on desktop, tablet, and mobile with horizontal scroll
 - **Visual interface** hardware-style with responsive colors
 - **Web Audio API** for low-latency audio playback
@@ -39,18 +43,42 @@ A personal experiment building an interactive drum machine inspired by Redrum, f
 - **Green/yellow pads** = currently playing
 
 ### Controls
-- **Play/Pause**: Start or pause playback
-- **Stop**: Stop and return to beginning
-- **Clear**: Erase current block's pattern
+- **Play/Pause**: Start or pause playback (shortcut: **Space**)
+- **Stop**: Stop and return to beginning (shortcut: **ESC**)
+- **Clear**: Erase current visible blocks' patterns (shortcut: **Ctrl+C**)
 - **BPM Slider**: Adjust speed (60-200 BPM)
+- **Swing Slider**: Add groove/shuffle (0-75%) - delays odd steps for human feel
 - **Sound selectors**: Choose different sounds for each instrument (4-5 variations each)
-- **Mute buttons**: 🔊/🔇 per channel to silence individual instruments during playback
-- **Volume dials**: Drag to adjust individual channel volume (0-100%)
+- **Mute buttons**: 🔊/🔇 per channel to silence individual instruments during playback (shortcuts: **1-8**)
+- **Volume dials**: Drag vertically to adjust individual channel volume (0-100%)
 - **▶ Preview buttons**: Test individual instrument sounds (plays currently selected variant)
-- **💾 Save / 📁 Load**: Save your pattern to a file or load a previously saved pattern
+- **💾 Save / 📁 Load**: Save your pattern to a file or load a previously saved pattern (includes BPM, swing, volumes, mutes)
 - **Demo Patterns**: Load pre-configured demo patterns to get started
 - **Block buttons (1/2/4/8)**: Set how many blocks are active
-- **◄ ► Navigation**: Switch between blocks to edit different sections
+- **View buttons (1/2/4)**: Set how many blocks are visible at once (default: 2)
+- **◄ ► Navigation**: Switch between visible blocks (shortcuts: **Left/Right arrows**)
+
+### Velocity System
+Click pads with different modifier keys for dynamics:
+- **Normal click**: 70% velocity (standard hit)
+- **Shift + click**: 100% velocity (accent - loud, emphasized hit with gold glow)
+- **Alt + click**: 30% velocity (ghost note - quiet, subtle hit with darker color)
+
+This allows for realistic, musical patterns with dynamics instead of robotic, same-volume hits.
+
+### Keyboard Shortcuts
+- **Space**: Play / Pause
+- **ESC**: Stop
+- **Ctrl+C**: Clear pattern
+- **1-8**: Toggle mute for channels 1-8
+- **Left/Right arrows**: Navigate between blocks
+
+### Multi-Block View
+By default, **2 blocks** are visible simultaneously, allowing you to see and edit longer patterns at once:
+- Click **View: 1/2/4** buttons to change how many blocks are shown
+- Visual separators (gold lines) mark block boundaries
+- Navigation arrows scroll through blocks
+- All editing works seamlessly across visible blocks
 
 ### Block System
 - **1 block** = 16 steps (basic patterns)
@@ -112,11 +140,14 @@ DrumNova/
 - Click **📁 Load** to upload a previously saved pattern file
 
 The saved file includes:
-- Your pattern sequence (all blocks)
+- Your pattern sequence (all blocks) with velocity data per pad
 - BPM setting
+- Swing/shuffle amount
 - Sound selections for each channel
 - Volume levels per channel
 - Mute states
+
+Pattern files are backward compatible - old patterns (boolean on/off) work with new features (velocity system).
 
 ### Using JavaScript (Advanced)
 
@@ -186,15 +217,19 @@ myNewPattern: {
 ## 🚧 Future Ideas (Maybe Someday)
 
 ### Possible Extensions
-- ✅ Export/Import patterns (already implemented at JS level)
+- ✅ Export/Import patterns with full settings
 - ✅ 8 channels with multiple sound variations
 - ✅ Block system (1/2/4/8 blocks = up to 128 steps)
 - ✅ Mute/Solo per channel (mute implemented)
 - ✅ Volume control per channel
+- ✅ Swing/Shuffle (0-75%)
+- ✅ Velocity per pad (ghost/normal/accent)
+- ✅ Multi-block view (see 1/2/4 blocks at once)
+- ✅ Keyboard shortcuts for workflow
+- ✅ Master bus compression for professional sound
 - ⬜ Save to browser localStorage
 - ⬜ Copy/paste blocks
-- ⬜ Effects (reverb, delay, filter)
-- ⬜ Swing/Shuffle
+- ⬜ Reverb/delay effects
 - ⬜ Step subdivision (32 steps)
 - ⬜ MIDI sync/export
 

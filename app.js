@@ -13,7 +13,8 @@ class DrumMachine {
         
         // Block system
         this.totalBlocks = 1; // Can be 1, 2, 4, or 8
-        this.currentBlock = 0; // Which block we're viewing/editing
+        this.currentBlock = 0; // Which block we're viewing/editing (start of visible range)
+        this.visibleBlocks = 2; // How many blocks to show at once (1, 2, or 4)
         
         // Sequencer data: 3D array (blocks x channels x steps)
         this.sequence = this.createEmptySequence();
@@ -27,9 +28,13 @@ class DrumMachine {
         // Volume for each channel (0.0 to 1.0)
         this.channelVolumes = [0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7];
         
+        // Swing amount (0-75%, affects offbeat timing)
+        this.swing = 0;
+        
         // Audio context and buffers
         this.audioContext = null;
         this.audioBuffers = {};
+        this.masterCompressor = null; // Master bus compressor
         
         // Demo patterns (updated for 8 channels with BPM and sound selections)
         this.demoPatterns = {
@@ -169,9 +174,13 @@ class DrumMachine {
     
     createEmptySequence() {
         // Create 8 blocks, each with 8 channels, each with 16 steps
+        // Each step is now an object: {active: boolean, velocity: number (0.3-1.0)}
         return Array(8).fill(null).map(() => 
             Array(this.channels).fill(null).map(() => 
-                Array(this.steps).fill(false)
+                Array(this.steps).fill(null).map(() => ({
+                    active: false,
+                    velocity: 0.7 // default (normal)
+                }))
             )
         );
     }
@@ -180,6 +189,7 @@ class DrumMachine {
         this.createGrid();
         this.populatePatternSelector();
         this.setupEventListeners();
+        this.setupKeyboardShortcuts();
         await this.initAudio();
     }
     
@@ -202,17 +212,24 @@ class DrumMachine {
         const grid = document.getElementById('sequencerGrid');
         grid.innerHTML = '';
         
+        const totalVisibleSteps = this.steps * this.visibleBlocks;
+        
         for (let channel = 0; channel < this.channels; channel++) {
             const row = document.createElement('div');
             row.className = 'channel-row';
             
-            for (let step = 0; step < this.steps; step++) {
+            for (let step = 0; step < totalVisibleSteps; step++) {
                 const pad = document.createElement('button');
                 pad.className = 'pad';
                 pad.dataset.channel = channel;
                 pad.dataset.step = step;
                 
-                pad.addEventListener('click', () => this.togglePad(channel, step));
+                // Add block separator class every 16 steps
+                if (step > 0 && step % 16 === 0) {
+                    pad.classList.add('block-separator');
+                }
+                
+                pad.addEventListener('click', (e) => this.togglePad(channel, step, e));
                 
                 row.appendChild(pad);
             }
@@ -250,6 +267,13 @@ class DrumMachine {
             }
         });
         
+        // Swing slider
+        const swingSlider = document.getElementById('swingSlider');
+        swingSlider.addEventListener('input', (e) => {
+            this.swing = parseInt(e.target.value);
+            document.getElementById('swingValue').textContent = this.swing;
+        });
+        
         // Block buttons
         document.querySelectorAll('.block-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -258,17 +282,29 @@ class DrumMachine {
             });
         });
         
+        // View buttons
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const view = parseInt(e.target.dataset.view);
+                this.setVisibleBlocks(view);
+                
+                // Update active state
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+        
         // Block navigation
         document.getElementById('prevBlock').addEventListener('click', () => {
             if (this.currentBlock > 0) {
-                this.currentBlock--;
+                this.currentBlock = Math.max(0, this.currentBlock - this.visibleBlocks);
                 this.updateBlockDisplay();
             }
         });
         
         document.getElementById('nextBlock').addEventListener('click', () => {
-            if (this.currentBlock < this.totalBlocks - 1) {
-                this.currentBlock++;
+            if (this.currentBlock + this.visibleBlocks < this.totalBlocks) {
+                this.currentBlock = Math.min(this.totalBlocks - this.visibleBlocks, this.currentBlock + this.visibleBlocks);
                 this.updateBlockDisplay();
             }
         });
@@ -399,6 +435,79 @@ class DrumMachine {
         });
     }
     
+    // Keyboard shortcuts
+    setupKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            // Ignore if typing in an input/select
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+            
+            switch(e.key.toLowerCase()) {
+                case ' ': // Space - Play/Pause
+                    e.preventDefault();
+                    if (this.isPlaying) {
+                        this.pause();
+                    } else {
+                        this.play();
+                    }
+                    break;
+                    
+                case 'escape': // ESC - Stop
+                    e.preventDefault();
+                    this.stop();
+                    break;
+                    
+                case 'c': // C - Clear (with Ctrl/Cmd)
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        this.clearPattern();
+                    }
+                    break;
+                    
+                case 'arrowleft': // Left arrow - Previous block
+                    e.preventDefault();
+                    if (this.currentBlock > 0) {
+                        this.currentBlock = Math.max(0, this.currentBlock - this.visibleBlocks);
+                        this.updateBlockDisplay();
+                    }
+                    break;
+                    
+                case 'arrowright': // Right arrow - Next block
+                    e.preventDefault();
+                    if (this.currentBlock + this.visibleBlocks < this.totalBlocks) {
+                        this.currentBlock = Math.min(this.totalBlocks - this.visibleBlocks, this.currentBlock + this.visibleBlocks);
+                        this.updateBlockDisplay();
+                    }
+                    break;
+                    
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                    // Mute channels 1-8
+                    if (!e.ctrlKey && !e.metaKey) {
+                        e.preventDefault();
+                        const channel = parseInt(e.key) - 1;
+                        this.toggleMute(channel);
+                        const muteBtn = document.querySelector(`[data-channel="${channel}"].mute-btn`);
+                        if (muteBtn) {
+                            if (this.mutedChannels[channel]) {
+                                muteBtn.classList.add('muted');
+                                muteBtn.textContent = '🔇';
+                            } else {
+                                muteBtn.classList.remove('muted');
+                                muteBtn.textContent = '🔊';
+                            }
+                        }
+                    }
+                    break;
+            }
+        });
+    }
+    
     updateDialRotation(channel) {
         const dial = document.querySelector(`.volume-dial[data-channel="${channel}"]`);
         if (!dial) return;
@@ -417,6 +526,15 @@ class DrumMachine {
     // Initialize Web Audio API
     async initAudio() {
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Create master compressor for better sound cohesion and punch
+        this.masterCompressor = this.audioContext.createDynamicsCompressor();
+        this.masterCompressor.threshold.setValueAtTime(-24, this.audioContext.currentTime); // dB
+        this.masterCompressor.knee.setValueAtTime(6, this.audioContext.currentTime);
+        this.masterCompressor.ratio.setValueAtTime(4, this.audioContext.currentTime); // 4:1 compression
+        this.masterCompressor.attack.setValueAtTime(0.003, this.audioContext.currentTime); // 3ms - fast attack for transients
+        this.masterCompressor.release.setValueAtTime(0.05, this.audioContext.currentTime); // 50ms - quick release
+        this.masterCompressor.connect(this.audioContext.destination);
         
         // List of sounds to generate (by default we will generate synthetic sounds)
         // The user will be able to replace them with their own files
@@ -632,7 +750,7 @@ class DrumMachine {
     }
     
     // Play a sound
-    playSound(soundName, channel = null) {
+    playSound(soundName, channel = null, swingDelay = 0, velocity = 0.7) {
         if (!this.audioBuffers[soundName]) {
             console.warn(`Sound not found: ${soundName}`);
             return;
@@ -643,16 +761,21 @@ class DrumMachine {
         
         const gainNode = this.audioContext.createGain();
         
-        // Apply channel volume if specified, otherwise use default
+        // Apply channel volume and velocity
+        let baseGain = 0.7;
         if (channel !== null && this.channelVolumes[channel] !== undefined) {
-            gainNode.gain.value = this.channelVolumes[channel];
-        } else {
-            gainNode.gain.value = 0.7;
+            baseGain = this.channelVolumes[channel];
         }
         
+        // Multiply by velocity for dynamic range
+        gainNode.gain.value = baseGain * velocity;
+        
         source.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
-        source.start(0);
+        gainNode.connect(this.masterCompressor); // Route through master compressor
+        
+        // Start with swing delay (in seconds)
+        const startTime = this.audioContext.currentTime + swingDelay;
+        source.start(startTime);
     }
     
     // Toggle mute state for a channel
@@ -662,18 +785,56 @@ class DrumMachine {
     }
     
     // Toggle pad state
-    togglePad(channel, step) {
-        this.sequence[this.currentBlock][channel][step] = !this.sequence[this.currentBlock][channel][step];
-        this.updatePadUI(channel, step);
+    togglePad(channel, visualStep, event) {
+        // Calculate which block and step within block
+        const blockOffset = Math.floor(visualStep / this.steps);
+        const blockIndex = this.currentBlock + blockOffset;
+        const stepWithinBlock = visualStep % this.steps;
+        
+        const step = this.sequence[blockIndex][channel][stepWithinBlock];
+        
+        // Determine velocity based on modifier keys
+        let velocity = 0.7; // Normal (default)
+        if (event && event.shiftKey) {
+            velocity = 1.0; // Accent (loud)
+        } else if (event && event.altKey) {
+            velocity = 0.3; // Ghost note (quiet)
+        }
+        
+        // Toggle the step or change velocity if already active
+        if (step.active && event && (event.shiftKey || event.altKey)) {
+            // If already active, change velocity
+            step.velocity = velocity;
+        } else {
+            // Toggle active state
+            step.active = !step.active;
+            if (step.active) {
+                step.velocity = velocity;
+            }
+        }
+        
+        this.updatePadUI(channel, visualStep, blockIndex, stepWithinBlock);
     }
     
     // Update pad visual state
-    updatePadUI(channel, step) {
-        const pad = document.querySelector(`[data-channel="${channel}"][data-step="${step}"]`);
-        if (this.sequence[this.currentBlock][channel][step]) {
+    updatePadUI(channel, visualStep, blockIndex, stepWithinBlock) {
+        const pad = document.querySelector(`[data-channel="${channel}"][data-step="${visualStep}"]`);
+        const step = this.sequence[blockIndex][channel][stepWithinBlock];
+        
+        if (step.active) {
             pad.classList.add('active');
+            
+            // Add velocity classes for visual feedback
+            pad.classList.remove('velocity-normal', 'velocity-accent', 'velocity-ghost');
+            if (step.velocity >= 0.9) {
+                pad.classList.add('velocity-accent');
+            } else if (step.velocity <= 0.4) {
+                pad.classList.add('velocity-ghost');
+            } else {
+                pad.classList.add('velocity-normal');
+            }
         } else {
-            pad.classList.remove('active');
+            pad.classList.remove('active', 'velocity-normal', 'velocity-accent', 'velocity-ghost');
         }
     }
     
@@ -711,12 +872,32 @@ class DrumMachine {
         }
     }
     
+    // Set visible blocks
+    setVisibleBlocks(view) {
+        this.visibleBlocks = Math.min(view, this.totalBlocks);
+        
+        // Reset to valid position if current is out of range
+        if (this.currentBlock + this.visibleBlocks > this.totalBlocks) {
+            this.currentBlock = Math.max(0, this.totalBlocks - this.visibleBlocks);
+        }
+        
+        // Recreate grid with new visible blocks
+        this.createGrid();
+        this.updateBlockDisplay();
+    }
+    
     // Update block display (reload grid with current block data)
     updateBlockDisplay() {
-        // Reload all pad states from current block
+        // Reload all pad states from visible blocks
         for (let channel = 0; channel < this.channels; channel++) {
-            for (let step = 0; step < this.steps; step++) {
-                this.updatePadUI(channel, step);
+            for (let visualStep = 0; visualStep < this.steps * this.visibleBlocks; visualStep++) {
+                const blockOffset = Math.floor(visualStep / this.steps);
+                const blockIndex = this.currentBlock + blockOffset;
+                const stepWithinBlock = visualStep % this.steps;
+                
+                if (blockIndex < this.totalBlocks) {
+                    this.updatePadUI(channel, visualStep, blockIndex, stepWithinBlock);
+                }
             }
         }
         this.updateBlockIndicator();
@@ -724,9 +905,10 @@ class DrumMachine {
     
     // Update block indicator text and navigation buttons
     updateBlockIndicator() {
-        document.getElementById('blockIndicator').textContent = `Block ${this.currentBlock + 1}/${this.totalBlocks}`;
+        const endBlock = Math.min(this.currentBlock + this.visibleBlocks, this.totalBlocks);
+        document.getElementById('blockIndicator').textContent = `Blocks ${this.currentBlock + 1}-${endBlock}/${this.totalBlocks}`;
         document.getElementById('prevBlock').disabled = this.currentBlock === 0;
-        document.getElementById('nextBlock').disabled = this.currentBlock === this.totalBlocks - 1;
+        document.getElementById('nextBlock').disabled = this.currentBlock + this.visibleBlocks >= this.totalBlocks;
     }
     
     // Play sequence
@@ -774,8 +956,18 @@ class DrumMachine {
         const blockIndex = Math.floor(this.currentStep / this.steps);
         const stepInBlock = this.currentStep % this.steps;
         
+        // Calculate swing delay for offbeat steps (odd steps: 1, 3, 5, 7...)
+        let swingDelay = 0;
+        if (stepInBlock % 2 === 1 && this.swing > 0) {
+            // Convert swing percentage to delay in seconds
+            // Base step duration is 1/4 of a beat (16th note)
+            const sixteenthNoteDuration = (60 / this.bpm) / 4;
+            // Swing percentage (0-75%) determines how much to delay
+            swingDelay = (this.swing / 100) * sixteenthNoteDuration;
+        }
+        
         // Only show visual feedback if we're viewing the currently playing block
-        const shouldShowVisual = blockIndex === this.currentBlock;
+        const shouldShowVisual = blockIndex >= this.currentBlock && blockIndex < this.currentBlock + this.visibleBlocks;
         
         // Clear previous playing indicators (only in current view)
         if (shouldShowVisual) {
@@ -784,21 +976,25 @@ class DrumMachine {
         
         // Play sounds and highlight active pads
         for (let channel = 0; channel < this.channels; channel++) {
+            const step = this.sequence[blockIndex][channel][stepInBlock];
+            
             // Check if this step is active in the current playing block
-            if (this.sequence[blockIndex][channel][stepInBlock] && !this.mutedChannels[channel]) {
+            if (step.active && !this.mutedChannels[channel]) {
                 const soundName = this.soundMap[channel];
-                this.playSound(soundName, channel);
+                this.playSound(soundName, channel, swingDelay, step.velocity);
                 
                 // Only show visual feedback if viewing the playing block
                 if (shouldShowVisual) {
-                    const pad = document.querySelector(`[data-channel="${channel}"][data-step="${stepInBlock}"]`);
+                    const visualStep = (blockIndex - this.currentBlock) * this.steps + stepInBlock;
+                    const pad = document.querySelector(`[data-channel="${channel}"][data-step="${visualStep}"]`);
                     if (pad) {
                         pad.classList.add('playing');
                     }
                 }
             } else if (shouldShowVisual) {
                 // Show current step even if not active (visual feedback)
-                const pad = document.querySelector(`[data-channel="${channel}"][data-step="${stepInBlock}"]`);
+                const visualStep = (blockIndex - this.currentBlock) * this.steps + stepInBlock;
+                const pad = document.querySelector(`[data-channel="${channel}"][data-step="${visualStep}"]`);
                 if (pad) {
                     pad.style.opacity = '0.7';
                     setTimeout(() => {
@@ -818,11 +1014,20 @@ class DrumMachine {
     
     // Clear pattern
     clearPattern() {
-        // Clear only the current block or all blocks?
-        // Let's clear only current block for now
-        this.sequence[this.currentBlock] = Array(this.channels).fill(null).map(() => Array(this.steps).fill(false));
+        // Clear visible blocks
+        for (let i = 0; i < this.visibleBlocks; i++) {
+            const blockIndex = this.currentBlock + i;
+            if (blockIndex < this.totalBlocks) {
+                this.sequence[blockIndex] = Array(this.channels).fill(null).map(() => 
+                    Array(this.steps).fill(null).map(() => ({
+                        active: false,
+                        velocity: 0.7
+                    }))
+                );
+            }
+        }
         document.querySelectorAll('.pad').forEach(pad => {
-            pad.classList.remove('active');
+            pad.classList.remove('active', 'velocity-normal', 'velocity-accent', 'velocity-ghost');
         });
     }
     
@@ -855,7 +1060,12 @@ class DrumMachine {
 
         // Clear all active blocks
         for (let blockIndex = 0; blockIndex < this.totalBlocks; blockIndex++) {
-            this.sequence[blockIndex] = Array(this.channels).fill(null).map(() => Array(this.steps).fill(false));
+            this.sequence[blockIndex] = Array(this.channels).fill(null).map(() => 
+                Array(this.steps).fill(null).map(() => ({
+                    active: false,
+                    velocity: 0.7
+                }))
+            );
         }
 
         // Calculate how many blocks this pattern spans
@@ -871,9 +1081,10 @@ class DrumMachine {
                 for (let step = 0; step < this.steps; step++) {
                     const patternStep = startStep + step;
                     if (patternStep < patternSteps) {
-                        this.sequence[blockIndex][channel][step] = pattern.pattern[channel][patternStep] === 1;
+                        this.sequence[blockIndex][channel][step].active = pattern.pattern[channel][patternStep] === 1;
+                        this.sequence[blockIndex][channel][step].velocity = 0.7; // Default velocity for demos
                     } else {
-                        this.sequence[blockIndex][channel][step] = false; // Fill remaining with false
+                        this.sequence[blockIndex][channel][step].active = false;
                     }
                 }
             }
@@ -890,13 +1101,17 @@ class DrumMachine {
         return {
             name: 'Custom Pattern',
             bpm: this.bpm,
+            swing: this.swing,
             totalBlocks: this.totalBlocks,
             soundMap: [...this.soundMap],
             channelVolumes: [...this.channelVolumes],
             mutedChannels: [...this.mutedChannels],
-            // Only export active blocks
+            // Only export active blocks with velocity data
             pattern: this.sequence.slice(0, this.totalBlocks).map(block =>
-                block.map(channel => channel.map(step => step ? 1 : 0))
+                block.map(channel => channel.map(step => ({
+                    active: step.active,
+                    velocity: step.velocity
+                })))
             )
         };
     }
@@ -946,6 +1161,12 @@ class DrumMachine {
             document.getElementById('bpmValue').textContent = this.bpm;
         }
         
+        if (patternData.swing !== undefined) {
+            this.swing = patternData.swing;
+            document.getElementById('swingSlider').value = this.swing;
+            document.getElementById('swingValue').textContent = this.swing;
+        }
+        
         if (patternData.totalBlocks) {
             this.setTotalBlocks(patternData.totalBlocks);
         }
@@ -979,7 +1200,21 @@ class DrumMachine {
             for (let blockIndex = 0; blockIndex < patternData.pattern.length; blockIndex++) {
                 for (let channel = 0; channel < this.channels; channel++) {
                     for (let step = 0; step < this.steps; step++) {
-                        this.sequence[blockIndex][channel][step] = patternData.pattern[blockIndex][channel][step] === 1;
+                        const stepData = patternData.pattern[blockIndex][channel][step];
+                        
+                        // Support both old format (boolean/number) and new format (object)
+                        if (typeof stepData === 'object' && stepData !== null) {
+                            this.sequence[blockIndex][channel][step] = {
+                                active: stepData.active || false,
+                                velocity: stepData.velocity || 0.7
+                            };
+                        } else {
+                            // Legacy format: 1/0 or true/false
+                            this.sequence[blockIndex][channel][step] = {
+                                active: stepData === 1 || stepData === true,
+                                velocity: 0.7
+                            };
+                        }
                     }
                 }
             }
