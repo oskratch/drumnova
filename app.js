@@ -173,7 +173,7 @@ class DrumMachine {
             }
         };
         
-        this.init();
+        // Note: init() is called explicitly after construction with await
     }
     
     createEmptySequence() {
@@ -584,7 +584,7 @@ class DrumMachine {
         
         // Create reverb (convolution reverb with synthetic impulse response)
         this.reverbNode = this.audioContext.createConvolver();
-        this.reverbNode.buffer = this.createReverbImpulse(2, 2, false); // 2 seconds, sample rate, reverse
+        this.reverbNode.buffer = this.createReverbImpulse(2, this.audioContext.sampleRate, false); // 2 seconds duration
         
         // Create dry/wet gain nodes
         this.dryGain = this.audioContext.createGain();
@@ -1075,14 +1075,20 @@ class DrumMachine {
     }
     
     // Play sequence
-    play() {
-        if (this.audioContext.state === 'suspended') {
-            this.audioContext.resume();
+    async play() {
+        // Guard against multiple simultaneous calls
+        if (this.isPlaying) {
+            return;
         }
         
+        // Set isPlaying FIRST to prevent double-triggering
         this.isPlaying = true;
         document.getElementById('playBtn').textContent = '⏸ Pause';
         document.getElementById('playBtn').classList.add('playing');
+        
+        if (this.audioContext.state === 'suspended') {
+            await this.audioContext.resume();
+        }
         
         const stepDuration = (60 / this.bpm) * 1000 / 4; // 16th notes
         
@@ -1403,8 +1409,9 @@ class DrumMachine {
 // Initialize drum machine when page loads
 let drumMachine;
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
     drumMachine = new DrumMachine();
+    await drumMachine.init();
     
     // Export to window for debugging and future extensions
     window.drumMachine = drumMachine;

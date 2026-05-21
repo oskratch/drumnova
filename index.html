@@ -24,21 +24,6 @@
 
             <!-- Tab Content -->
             <div class="tab-content active" id="tab-pattern">
-                <div class="bpm-section">
-                    <label for="bpmSlider">BPM: <span id="bpmValue">120</span></label>
-                    <input type="range" id="bpmSlider" min="60" max="200" value="120" step="1">
-                </div>
-            </div>
-
-            <div class="tab-content" id="tab-swing">
-                <div class="swing-section">
-                    <label for="swingSlider">Swing: <span id="swingValue">0</span>%</label>
-                    <input type="range" id="swingSlider" min="0" max="75" value="0" step="1">
-                    <div class="hint">💡 Tip: Click = normal | Shift+Click = accent | Alt+Click = ghost note</div>
-                </div>
-            </div>
-
-            <div class="tab-content" id="tab-pattern">
                 <!-- Save/Load Pattern Section -->
                 <div class="save-load-section">
                     <label>Pattern:</label>
@@ -54,6 +39,21 @@
                         <!-- Populated dynamically from JS -->
                     </select>
                     <button id="loadPattern" class="btn btn-secondary">Load</button>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-bpm">
+                <div class="bpm-section">
+                    <label for="bpmSlider">BPM: <span id="bpmValue">120</span></label>
+                    <input type="range" id="bpmSlider" min="60" max="200" value="120" step="1">
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-swing">
+                <div class="swing-section">
+                    <label for="swingSlider">Swing: <span id="swingValue">0</span>%</label>
+                    <input type="range" id="swingSlider" min="0" max="75" value="0" step="1">
+                    <div class="hint">💡 Tip: Click = normal | Shift+Click = accent | Alt+Click = ghost note</div>
                 </div>
             </div>
 
