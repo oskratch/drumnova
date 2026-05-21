@@ -627,26 +627,75 @@ class DrumMachine {
         const impulseL = impulse.getChannelData(0);
         const impulseR = impulse.getChannelData(1);
         
+        // Parameters for realistic room reverb
+        const preDelay = 0.02; // 20ms pre-delay
+        const preDelaySamples = Math.floor(sampleRate * preDelay);
+        
+        // Early reflections pattern (simulating wall bounces)
+        const earlyReflections = [
+            { time: 0.005, gain: 0.6 },
+            { time: 0.012, gain: 0.5 },
+            { time: 0.019, gain: 0.45 },
+            { time: 0.026, gain: 0.4 },
+            { time: 0.034, gain: 0.35 },
+            { time: 0.041, gain: 0.3 },
+            { time: 0.053, gain: 0.25 },
+            { time: 0.068, gain: 0.2 }
+        ];
+        
         for (let i = 0; i < length; i++) {
-            // Exponential decay for natural reverb tail
-            const decay = Math.exp(-3 * i / length);
+            const t = i / sampleRate;
+            let sampleL = 0;
+            let sampleR = 0;
             
-            // Add some early reflections (first 10% of impulse)
-            let earlyReflection = 0;
-            if (i < length * 0.1) {
-                const reflectionPattern = [0.02, 0.05, 0.08, 0.12, 0.15]; // Reflection times
-                for (let r = 0; r < reflectionPattern.length; r++) {
-                    if (Math.abs(i / length - reflectionPattern[r]) < 0.005) {
-                        earlyReflection += (Math.random() * 2 - 1) * 0.5;
+            // Skip pre-delay period
+            if (i < preDelaySamples) {
+                impulseL[i] = 0;
+                impulseR[i] = 0;
+                continue;
+            }
+            
+            // Early reflections (first 80ms)
+            if (t < 0.08) {
+                for (let ref of earlyReflections) {
+                    const refSample = Math.floor(ref.time * sampleRate);
+                    if (Math.abs(i - refSample) < 3) {
+                        const gaussian = Math.exp(-Math.pow((i - refSample) / 2, 2));
+                        sampleL += (Math.random() * 2 - 1) * ref.gain * gaussian;
+                        sampleR += (Math.random() * 2 - 1) * ref.gain * gaussian * 0.85;
                     }
                 }
             }
             
-            // Diffuse reverb tail (random noise with decay)
-            const diffuse = (Math.random() * 2 - 1) * decay;
+            // Dense reverb tail
+            if (t > 0.04) {
+                // Multiple decay rates for more natural sound
+                const fastDecay = Math.exp(-4 * (t - 0.04) / duration);
+                const slowDecay = Math.exp(-2 * (t - 0.04) / duration);
+                const midDecay = Math.exp(-3 * (t - 0.04) / duration);
+                
+                // High frequency damping (rooms absorb highs more)
+                const hfDamping = Math.exp(-5 * t / duration);
+                
+                // Dense diffusion (many small reflections)
+                const density = 0.6; // Probability of reflection
+                if (Math.random() < density) {
+                    const baseNoise = (Math.random() * 2 - 1);
+                    
+                    // Mix different decay curves for complexity
+                    const reverbSample = baseNoise * (
+                        0.5 * fastDecay * hfDamping +  // High frequencies decay fast
+                        0.3 * midDecay +                // Mid frequencies
+                        0.2 * slowDecay                 // Low frequencies linger
+                    );
+                    
+                    sampleL += reverbSample;
+                    sampleR += reverbSample * (0.9 + Math.random() * 0.2); // Slightly decorrelated
+                }
+            }
             
-            impulseL[i] = (diffuse + earlyReflection) * 0.5;
-            impulseR[i] = (diffuse + earlyReflection * 0.8) * 0.5; // Slightly different for stereo
+            impulseL[i] = sampleL * 0.3;
+            impulseR[i] = sampleR * 0.3;
         }
         
         return impulse;
