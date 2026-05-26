@@ -557,6 +557,11 @@ class DrumMachine {
     
     setupMobileModal() {
         const modal = document.getElementById('channelModal');
+        if (!modal) {
+            console.warn('Channel modal not found');
+            return;
+        }
+        
         const modalClose = modal.querySelector('.modal-close');
         const modalPreviewBtn = document.getElementById('modalPreviewBtn');
         const modalMuteBtn = document.getElementById('modalMuteBtn');
@@ -665,7 +670,8 @@ class DrumMachine {
         };
         
         // Open modal when mobile channel button is clicked
-        document.querySelectorAll('.mobile-channel-btn').forEach(btn => {
+        const mobileButtons = document.querySelectorAll('.mobile-channel-btn');
+        mobileButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const channel = parseInt(e.target.dataset.channel);
                 openModalForChannel(channel);
