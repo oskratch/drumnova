@@ -95,11 +95,40 @@
                 </div>
             </div>
 
+            <!-- Mobile Channel Settings Modal -->
+            <div id="channelModal" class="channel-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modalChannelName">Channel Settings</h3>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-instrument-selector">
+                            <label>Sound:</label>
+                            <select id="modalSoundSelector" class="sound-selector-modal">
+                                <!-- Options will be populated by JS -->
+                            </select>
+                        </div>
+                        <button id="modalPreviewBtn" class="btn-modal-preview">▶ Preview Sound</button>
+                        <div class="modal-mute">
+                            <label>Mute:</label>
+                            <button id="modalMuteBtn" class="btn-modal-mute">🔊</button>
+                        </div>
+                        <div class="modal-volume">
+                            <label>Volume:</label>
+                            <input type="range" id="modalVolumeSlider" min="0" max="100" value="70" step="1">
+                            <span id="modalVolumeValue">70%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Sequencer Grid -->
             <div class="sequencer">
                 <div class="channel-labels">
                     <div class="label-header">INSTRUMENT</div>
                     <div class="channel-label">
+                        <button class="mobile-settings-btn" data-channel="0" title="Channel settings">⚙</button>
                         <button class="preview-btn" data-channel="0" title="Preview sound">▶</button>
                         <button class="mute-btn" data-channel="0" title="Mute channel">🔊</button>
                         <div class="volume-dial" data-channel="0" title="Volume">
@@ -120,6 +149,7 @@
                         </div>
                     </div>
                     <div class="channel-label">
+                        <button class="mobile-settings-btn" data-channel="1" title="Channel settings">⚙</button>
                         <button class="preview-btn" data-channel="1" title="Preview sound">▶</button>
                         <button class="mute-btn" data-channel="1" title="Mute channel">🔊</button>
                         <div class="volume-dial" data-channel="1" title="Volume">
@@ -140,6 +170,7 @@
                         </div>
                     </div>
                     <div class="channel-label">
+                        <button class="mobile-settings-btn" data-channel="2" title="Channel settings">⚙</button>
                         <button class="preview-btn" data-channel="2" title="Preview sound">▶</button>
                         <button class="mute-btn" data-channel="2" title="Mute channel">🔊</button>
                         <div class="volume-dial" data-channel="2" title="Volume">
@@ -160,6 +191,7 @@
                         </div>
                     </div>
                     <div class="channel-label">
+                        <button class="mobile-settings-btn" data-channel="3" title="Channel settings">⚙</button>
                         <button class="preview-btn" data-channel="3" title="Preview sound">▶</button>
                         <button class="mute-btn" data-channel="3" title="Mute channel">🔊</button>
                         <div class="volume-dial" data-channel="3" title="Volume">
@@ -180,6 +212,7 @@
                         </div>
                     </div>
                     <div class="channel-label">
+                        <button class="mobile-settings-btn" data-channel="4" title="Channel settings">⚙</button>
                         <button class="preview-btn" data-channel="4" title="Preview sound">▶</button>
                         <button class="mute-btn" data-channel="4" title="Mute channel">🔊</button>
                         <div class="volume-dial" data-channel="4" title="Volume">
@@ -199,6 +232,7 @@
                         </div>
                     </div>
                     <div class="channel-label">
+                        <button class="mobile-settings-btn" data-channel="5" title="Channel settings">⚙</button>
                         <button class="preview-btn" data-channel="5" title="Preview sound">▶</button>
                         <button class="mute-btn" data-channel="5" title="Mute channel">🔊</button>
                         <div class="volume-dial" data-channel="5" title="Volume">
@@ -219,6 +253,7 @@
                         </div>
                     </div>
                     <div class="channel-label">
+                        <button class="mobile-settings-btn" data-channel="6" title="Channel settings">⚙</button>
                         <button class="preview-btn" data-channel="6" title="Preview sound">▶</button>
                         <button class="mute-btn" data-channel="6" title="Mute channel">🔊</button>
                         <div class="volume-dial" data-channel="6" title="Volume">
@@ -238,6 +273,7 @@
                         </div>
                     </div>
                     <div class="channel-label">
+                        <button class="mobile-settings-btn" data-channel="7" title="Channel settings">⚙</button>
                         <button class="preview-btn" data-channel="7" title="Preview sound">▶</button>
                         <button class="mute-btn" data-channel="7" title="Mute channel">🔊</button>
                         <div class="volume-dial" data-channel="7" title="Volume">
@@ -259,14 +295,24 @@
                     </div>
                 </div>
 
+                <!-- Mobile Settings Column (only visible on mobile) -->
+                <div class="mobile-settings-column">
+                    <div class="mobile-header"></div>
+                    <button class="mobile-channel-btn" data-channel="0" title="Kick settings">⚙</button>
+                    <button class="mobile-channel-btn" data-channel="1" title="Snare settings">⚙</button>
+                    <button class="mobile-channel-btn" data-channel="2" title="HiHat settings">⚙</button>
+                    <button class="mobile-channel-btn" data-channel="3" title="Clap settings">⚙</button>
+                    <button class="mobile-channel-btn" data-channel="4" title="Tom settings">⚙</button>
+                    <button class="mobile-channel-btn" data-channel="5" title="Perc settings">⚙</button>
+                    <button class="mobile-channel-btn" data-channel="6" title="Cymbal settings">⚙</button>
+                    <button class="mobile-channel-btn" data-channel="7" title="FX settings">⚙</button>
+                </div>
+
                 <div class="grid-container">
                     <div class="step-indicators">
                         <div class="indicator-header"></div>
                         <div class="step-numbers">
-                            <span>1</span><span>2</span><span>3</span><span>4</span>
-                            <span>5</span><span>6</span><span>7</span><span>8</span>
-                            <span>9</span><span>10</span><span>11</span><span>12</span>
-                            <span>13</span><span>14</span><span>15</span><span>16</span>
+                            <!-- Numbers generated by JavaScript -->
                         </div>
                     </div>
 

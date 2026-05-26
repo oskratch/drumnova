@@ -190,6 +190,7 @@ class DrumMachine {
     }
     
     async init() {
+        this.setupMobileModal();
         this.createGrid();
         this.populatePatternSelector();
         this.setupEventListeners();
@@ -550,6 +551,226 @@ class DrumMachine {
                         }
                     }
                     break;
+            }
+        });
+    }
+    
+    setupMobileModal() {
+        const modal = document.getElementById('channelModal');
+        const modalClose = modal.querySelector('.modal-close');
+        const modalPreviewBtn = document.getElementById('modalPreviewBtn');
+        const modalMuteBtn = document.getElementById('modalMuteBtn');
+        const modalVolumeSlider = document.getElementById('modalVolumeSlider');
+        const modalVolumeValue = document.getElementById('modalVolumeValue');
+        const modalSoundSelector = document.getElementById('modalSoundSelector');
+        const modalChannelName = document.getElementById('modalChannelName');
+        
+        let currentModalChannel = null;
+        
+        // Sound options for each channel (same as HTML)
+        const soundOptions = {
+            0: [ // Kick
+                { value: 'kick', label: 'Kick 808' },
+                { value: 'kick2', label: 'Kick Vintage' },
+                { value: 'kick3', label: 'Kick Electro' },
+                { value: 'kick4', label: 'Kick Deep' },
+                { value: 'kick5', label: 'Kick Punchy' }
+            ],
+            1: [ // Snare
+                { value: 'snare', label: 'Snare 808' },
+                { value: 'snare2', label: 'Snare Vintage' },
+                { value: 'snare3', label: 'Snare Clap' },
+                { value: 'snare4', label: 'Snare Tight' },
+                { value: 'snare5', label: 'Snare Rimshot' }
+            ],
+            2: [ // HiHat
+                { value: 'hihat', label: 'HiHat Closed' },
+                { value: 'hihat2', label: 'HiHat Open' },
+                { value: 'hihat3', label: 'HiHat Pedal' },
+                { value: 'hihat4', label: 'HiHat Brush' },
+                { value: 'hihat5', label: 'HiHat 909' }
+            ],
+            3: [ // Clap
+                { value: 'clap', label: 'Clap Sharp' },
+                { value: 'clap2', label: 'Clap Room' },
+                { value: 'clap3', label: 'Clap Echo' },
+                { value: 'clap4', label: 'Clap Thick' },
+                { value: 'clap5', label: 'Clap Vintage' }
+            ],
+            4: [ // Tom
+                { value: 'tom', label: 'Tom Low' },
+                { value: 'tom2', label: 'Tom Mid' },
+                { value: 'tom3', label: 'Tom High' },
+                { value: 'tom4', label: 'Tom Floor' }
+            ],
+            5: [ // Perc
+                { value: 'perc', label: 'Perc Shaker' },
+                { value: 'perc2', label: 'Perc Cowbell' },
+                { value: 'perc3', label: 'Perc Conga' },
+                { value: 'perc4', label: 'Perc Woodblock' },
+                { value: 'perc5', label: 'Perc Tambourine' }
+            ],
+            6: [ // Cymbal
+                { value: 'cymbal', label: 'Cymbal Crash' },
+                { value: 'cymbal2', label: 'Cymbal Ride' },
+                { value: 'cymbal3', label: 'Cymbal China' },
+                { value: 'cymbal4', label: 'Cymbal Splash' }
+            ],
+            7: [ // FX
+                { value: 'fx', label: 'FX Laser' },
+                { value: 'fx2', label: 'FX Sweep' },
+                { value: 'fx3', label: 'FX Stab' },
+                { value: 'fx4', label: 'FX Noise' },
+                { value: 'fx5', label: 'FX Bell' }
+            ]
+        };
+        
+        const channelNames = ['Kick', 'Snare', 'HiHat', 'Clap', 'Tom', 'Perc', 'Cymbal', 'FX'];
+        
+        // Function to open modal for a specific channel
+        const openModalForChannel = (channel) => {
+            currentModalChannel = channel;
+            
+            // Set modal title
+            modalChannelName.textContent = channelNames[channel];
+            
+            // Populate sound selector
+            modalSoundSelector.innerHTML = '';
+            soundOptions[channel].forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option.value;
+                opt.textContent = option.label;
+                if (this.soundMap[channel] === option.value) {
+                    opt.selected = true;
+                }
+                modalSoundSelector.appendChild(opt);
+            });
+            
+            // Set mute button state
+            if (this.mutedChannels[channel]) {
+                modalMuteBtn.classList.add('muted');
+                modalMuteBtn.textContent = '🔇';
+            } else {
+                modalMuteBtn.classList.remove('muted');
+                modalMuteBtn.textContent = '🔊';
+            }
+            
+            // Set volume slider
+            const volumePercent = Math.round(this.channelVolumes[channel] * 100);
+            modalVolumeSlider.value = volumePercent;
+            modalVolumeValue.textContent = volumePercent + '%';
+            
+            // Show modal
+            modal.classList.add('active');
+        };
+        
+        // Open modal when mobile channel button is clicked
+        document.querySelectorAll('.mobile-channel-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const channel = parseInt(e.target.dataset.channel);
+                openModalForChannel(channel);
+            });
+        });
+        
+        // Open modal when mobile settings button is clicked (legacy channel-labels buttons)
+        document.querySelectorAll('.mobile-settings-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const channel = parseInt(e.target.dataset.channel);
+                currentModalChannel = channel;
+                
+                // Set modal title
+                modalChannelName.textContent = channelNames[channel];
+                
+                // Populate sound selector
+                modalSoundSelector.innerHTML = '';
+                soundOptions[channel].forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option.value;
+                    opt.textContent = option.label;
+                    if (this.soundMap[channel] === option.value) {
+                        opt.selected = true;
+                    }
+                    modalSoundSelector.appendChild(opt);
+                });
+                
+                // Set mute button state
+                if (this.mutedChannels[channel]) {
+                    modalMuteBtn.classList.add('muted');
+                    modalMuteBtn.textContent = '🔇';
+                } else {
+                    modalMuteBtn.classList.remove('muted');
+                    modalMuteBtn.textContent = '🔊';
+                }
+                
+                // Set volume slider
+                const volumePercent = Math.round(this.channelVolumes[channel] * 100);
+                modalVolumeSlider.value = volumePercent;
+                modalVolumeValue.textContent = volumePercent + '%';
+                
+                // Show modal
+                modal.classList.add('active');
+            });
+        });
+        
+        // Close modal
+        const closeModal = () => {
+            modal.classList.remove('active');
+            currentModalChannel = null;
+        };
+        
+        modalClose.addEventListener('click', closeModal);
+        
+        // Close when clicking outside modal content
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        
+        // Preview button
+        modalPreviewBtn.addEventListener('click', () => {
+            if (currentModalChannel !== null) {
+                const soundName = this.soundMap[currentModalChannel];
+                this.playSound(soundName, currentModalChannel);
+            }
+        });
+        
+        // Mute button
+        modalMuteBtn.addEventListener('click', () => {
+            if (currentModalChannel !== null) {
+                this.toggleMute(currentModalChannel);
+                
+                // Update modal button
+                if (this.mutedChannels[currentModalChannel]) {
+                    modalMuteBtn.classList.add('muted');
+                    modalMuteBtn.textContent = '🔇';
+                } else {
+                    modalMuteBtn.classList.remove('muted');
+                    modalMuteBtn.textContent = '🔊';
+                }
+            }
+        });
+        
+        // Volume slider
+        modalVolumeSlider.addEventListener('input', (e) => {
+            if (currentModalChannel !== null) {
+                const volume = parseInt(e.target.value) / 100;
+                this.channelVolumes[currentModalChannel] = volume;
+                modalVolumeValue.textContent = e.target.value + '%';
+                this.updateDialRotation(currentModalChannel);
+            }
+        });
+        
+        // Sound selector
+        modalSoundSelector.addEventListener('change', (e) => {
+            if (currentModalChannel !== null) {
+                this.soundMap[currentModalChannel] = e.target.value;
+                
+                // Update desktop selector too
+                const desktopSelector = document.querySelector(`.sound-selector[data-channel="${currentModalChannel}"]`);
+                if (desktopSelector) {
+                    desktopSelector.value = e.target.value;
+                }
             }
         });
     }

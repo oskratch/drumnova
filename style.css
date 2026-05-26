@@ -529,6 +529,7 @@ body {
     display: flex;
     gap: 15px;
     margin-bottom: 25px;
+    width: 100%;
 }
 
 .channel-labels {
@@ -703,11 +704,14 @@ body {
 
 .grid-container {
     flex: 1;
+    min-width: 0; /* Allow shrinking below content width */
+    overflow: visible;
 }
 
 .step-indicators {
     display: flex;
     flex-direction: column;
+    width: 100%;
 }
 
 .indicator-header {
@@ -721,6 +725,7 @@ body {
     height: 32px; /* Same as label-header */
     align-items: center;
     margin-bottom: 0;
+    width: 100%;
 }
 
 .step-numbers span {
@@ -736,6 +741,7 @@ body {
     gap: 2px;
     /* Vertical alignment offset - adjust this value to fine-tune */
     margin-top: var(--vertical-offset, 12px);
+    width: 100%;
 }
 
 .channel-row {
@@ -1059,11 +1065,12 @@ body {
     }
     
     .block-buttons {
-        justify-content: center;
+        justify-content: left;
     }
     
     .block-navigation {
-        justify-content: center;
+        justify-content: left;
+        margin-left: 0;
     }
     
     /* Pattern section stacked */
@@ -1163,15 +1170,408 @@ body {
         padding: 6px 10px;
         font-size: 12px;
     }
+}
+
+/* ========================================
+   MOBILE CHANNEL MODAL
+   ======================================== */
+
+/* Mobile settings button - hidden on desktop, visible on mobile */
+.mobile-settings-btn {
+    display: none; /* Hidden by default (desktop) */
+}
+
+/* Mobile settings column - hidden on desktop */
+.mobile-settings-column {
+    display: none;
+    flex-direction: column;
+    gap: 3px; /* Match gap between channel rows */
+    padding-right: 8px;
+}
+
+.mobile-header {
+    height: 32px; /* Match step-numbers height */
+    margin-bottom: 0;
+}
+
+.mobile-channel-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-size: 16px;
+    min-height: 50px; /* Match channel row height */
+    width: 40px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.mobile-channel-btn:active {
+    transform: scale(0.9);
+}
+
+/* Row settings button - at the start of each pattern row */
+.row-settings-btn {
+    display: none; /* Hidden on desktop */
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.row-settings-btn:active {
+    transform: scale(0.9);
+}
+
+/* Settings placeholder in step numbers row */
+.settings-placeholder {
+    display: none; /* Hidden on desktop */
+}
+
+/* Channel Modal */
+.channel-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.channel-modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: linear-gradient(145deg, #2a2a3e, #1f1f2e);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 2px solid #3a3a4e;
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 2px solid #3a3a4e;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.3em;
+    color: white;
+}
+
+.modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    line-height: 1;
+    padding: 0;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.modal-body {
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modal-instrument-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modal-instrument-selector label {
+    font-weight: bold;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.sound-selector-modal {
+    background: #1a1a2e;
+    color: white;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 15px;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+}
+
+.btn-modal-preview {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-modal-preview:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
+.modal-mute {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.modal-mute label {
+    font-weight: bold;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-modal-mute {
+    background: rgba(102, 126, 234, 0.2);
+    border: 2px solid #667eea;
+    color: white;
+    font-size: 24px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-modal-mute.muted {
+    background: rgba(234, 102, 102, 0.2);
+    border-color: #ea6666;
+}
+
+.modal-volume {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-volume label {
+    font-weight: bold;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+#modalVolumeSlider {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+    -webkit-appearance: none;
+}
+
+#modalVolumeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.5);
+}
+
+#modalVolumeSlider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.5);
+    border: none;
+}
+
+#modalVolumeValue {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #667eea;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    /* Show mobile settings column */
+    .mobile-settings-column {
+        display: flex;
+        flex-shrink: 0; /* Don't shrink */
+        flex-grow: 0; /* Don't grow */
+    }
     
-    /* Scroll hint */
-    .sequencer::after {
-        content: '← Swipe to scroll →';
-        display: block;
-        text-align: center;
+    /* Hide channel labels column on mobile */
+    .channel-labels {
+        display: none;
+    }
+    
+    /* Make grid container scrollable */
+    .grid-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        flex: 1 1 0;
+        min-width: 0; /* Allow flex item to shrink below content size */
+        width: 100%;
+    }
+    
+    /* Allow grid to be wider than container for scrolling */
+    .step-numbers,
+    .grid {
+        width: fit-content;
+    }
+    
+    .grid {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        margin-top: 0; /* Remove vertical offset on mobile */
+    }
+    
+    /* Ensure sequencer stays as row layout */
+    .sequencer {
+        overflow: visible;
+        flex-direction: row !important;
+        gap: 5px;
+        width: 100%;
+    }
+    
+    /* Adjust mobile button sizes */
+    .mobile-channel-btn {
+        height: 39px; /* Match row height (36px pad + 3px gap) */
+        width: 32px;
+        font-size: 14px;
+        min-height: unset; /* Remove min-height */
+    }
+    
+    .mobile-header {
+        margin-bottom: 3px; /* Match row spacing */
+    }
+    
+    /* Adjust step numbers spacing and size for mobile */
+    .step-numbers {
+        margin-bottom: 3px;
+        gap: 3px; /* Match channel-row gap for alignment */
+        grid-template-columns: unset !important; /* Override JS inline style */
+        display: flex; /* Change to flex for fixed-width children */
+    }
+    
+    .step-numbers span {
         font-size: 11px;
-        color: rgba(255, 255, 255, 0.4);
-        margin-top: 8px;
-        font-style: italic;
+        width: 36px; /* Match pad width */
+        flex-shrink: 0;
+        text-align: center;
+    }
+    
+    /* Make pads larger on mobile for better touch */
+    .pad {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 11px;
+        flex-shrink: 0; /* Don't shrink */
+    }
+    
+    /* Adjust channel row gap and spacing */
+    .channel-row {
+        gap: 3px;
+        margin-bottom: 3px;
+        min-height: unset; /* Remove min-height to let pads control */
+        grid-template-columns: unset !important; /* Override JS inline style */
+        display: flex; /* Change to flex for fixed-width pads */
+    }
+    
+    /* Show row settings buttons in pattern rows */
+    .row-settings-btn {
+        display: flex;
+    }
+    
+    /* Show settings placeholder in step numbers row */
+    .settings-placeholder {
+        display: block;
+        width: 32px;
+    }
+    
+    /* Show mobile settings button (legacy - for channel-labels if kept) */
+    .mobile-settings-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        font-size: 18px;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    .mobile-settings-btn:active {
+        transform: scale(0.9);
+    }
+
+    /* Hide desktop controls on mobile */
+    .channel-label .preview-btn,
+    .channel-label .mute-btn,
+    .channel-label .volume-dial {
+        display: none;
+    }
+
+    /* Adjust channel label for mobile */
+    .channel-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px;
+    }
+
+    .label-content {
+        flex: 1;
+        min-width: 0;
     }
 }
