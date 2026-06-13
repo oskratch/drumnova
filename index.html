@@ -31,7 +31,12 @@
             </div>
 
             <!-- ── Controls Panel ───────────────────────── -->
-            <div class="controls-panel">
+            <div class="controls-panel" id="controlsPanel">
+                <button class="ctrl-collapse-btn" id="ctrlCollapseBtn" aria-label="Toggle controls">
+                    <span class="cct-text">CONTROLS</span>
+                    <span class="cct-arrow">&#9660;</span>
+                </button>
+                <div class="ctrl-inner">
                 <div class="ctrl-group">
                     <span class="ctrl-label">BPM</span>
                     <span class="ctrl-value" id="bpmValue">120</span>
@@ -74,6 +79,7 @@
                     <span id="blockIndicator" class="block-indicator">1–2 / 1</span>
                     <button id="nextBlock" class="nav-btn">&#9654;</button>
                 </div>
+                </div><!-- /.ctrl-inner -->
             </div>
 
             <!-- ── Pattern Bar ──────────────────────────── -->
@@ -316,14 +322,14 @@
                 <!-- Mobile settings column -->
                 <div class="mobile-settings-column">
                     <div class="mobile-header"></div>
-                    <button class="mobile-channel-btn" data-channel="0" title="Kick">&#9881;</button>
-                    <button class="mobile-channel-btn" data-channel="1" title="Snare">&#9881;</button>
-                    <button class="mobile-channel-btn" data-channel="2" title="HiHat">&#9881;</button>
-                    <button class="mobile-channel-btn" data-channel="3" title="Clap">&#9881;</button>
-                    <button class="mobile-channel-btn" data-channel="4" title="Tom">&#9881;</button>
-                    <button class="mobile-channel-btn" data-channel="5" title="Perc">&#9881;</button>
-                    <button class="mobile-channel-btn" data-channel="6" title="Cymbal">&#9881;</button>
-                    <button class="mobile-channel-btn" data-channel="7" title="FX">&#9881;</button>
+                    <button class="mobile-channel-btn" data-channel="0" title="Kick settings">KCK</button>
+                    <button class="mobile-channel-btn" data-channel="1" title="Snare settings">SNR</button>
+                    <button class="mobile-channel-btn" data-channel="2" title="HiHat settings">HHT</button>
+                    <button class="mobile-channel-btn" data-channel="3" title="Clap settings">CLP</button>
+                    <button class="mobile-channel-btn" data-channel="4" title="Tom settings">TOM</button>
+                    <button class="mobile-channel-btn" data-channel="5" title="Perc settings">PRC</button>
+                    <button class="mobile-channel-btn" data-channel="6" title="Cymbal settings">CYM</button>
+                    <button class="mobile-channel-btn" data-channel="7" title="FX settings">FX</button>
                 </div>
 
                 <!-- Grid -->
@@ -337,6 +343,18 @@
             </div><!-- /.sequencer -->
 
         </div><!-- /.drum-machine -->
+
+        <!-- ── Mobile Transport Bar (fixed bottom, mobile only) ── -->
+        <div class="mobile-transport-bar" id="mobileTransportBar" role="toolbar">
+            <button class="mtb-btn mtb-play" id="mobilePlayBtn">&#9654;</button>
+            <button class="mtb-btn mtb-stop" id="mobileStopBtn">&#9632;</button>
+            <button class="mtb-btn mtb-clear" id="mobileClearBtn">CLR</button>
+            <div class="mtb-divider"></div>
+            <div class="mtb-meta">
+                <span class="mtb-bpm"><span id="mtbBpm">120</span><small>BPM</small></span>
+                <span class="mtb-blocks" id="mtbBlocks">1–1</span>
+            </div>
+        </div>
 
         <footer class="footer">
             <p>Developed by <a href="https://oscarperiche.com" target="_blank">Oscar Periche</a></p>

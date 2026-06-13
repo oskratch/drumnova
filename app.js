@@ -44,6 +44,7 @@ class DrumMachine {
         this.populatePatternSelector();
         this.setupEventListeners();
         this.setupKeyboardShortcuts();
+        this.setupMobileTransport();
         await this.initAudio();
     }
 
@@ -106,6 +107,8 @@ class DrumMachine {
         bpmSlider.addEventListener('input', (e) => {
             this.bpm = parseInt(e.target.value);
             document.getElementById('bpmValue').textContent = this.bpm;
+            const mtbBpm = document.getElementById('mtbBpm');
+            if (mtbBpm) mtbBpm.textContent = this.bpm;
             if (this.isPlaying) { this.stop(); this.play(); }
         });
 
@@ -425,6 +428,27 @@ class DrumMachine {
         });
     }
 
+    setupMobileTransport() {
+        const mobilePlay = document.getElementById('mobilePlayBtn');
+        const mobileStop = document.getElementById('mobileStopBtn');
+        const mobileClear = document.getElementById('mobileClearBtn');
+        const ctrlCollapseBtn = document.getElementById('ctrlCollapseBtn');
+        const controlsPanel = document.getElementById('controlsPanel');
+
+        if (mobilePlay) mobilePlay.addEventListener('click', () => {
+            if (this.isPlaying) this.pause(); else this.play();
+        });
+
+        if (mobileStop) mobileStop.addEventListener('click', () => this.stop());
+        if (mobileClear) mobileClear.addEventListener('click', () => this.clearPattern());
+
+        if (ctrlCollapseBtn && controlsPanel) {
+            ctrlCollapseBtn.addEventListener('click', () => {
+                controlsPanel.classList.toggle('expanded');
+            });
+        }
+    }
+
     updateDialRotation(channel) {
         const dial = document.querySelector(`.volume-dial[data-channel="${channel}"]`);
         if (!dial) return;
@@ -602,8 +626,10 @@ class DrumMachine {
 
     updateBlockIndicator() {
         const endBlock = Math.min(this.currentBlock + this.visibleBlocks, this.totalBlocks);
-        document.getElementById('blockIndicator').textContent =
-            `Blocks ${this.currentBlock + 1}-${endBlock}/${this.totalBlocks}`;
+        const label = `Blocks ${this.currentBlock + 1}-${endBlock}/${this.totalBlocks}`;
+        document.getElementById('blockIndicator').textContent = label;
+        const mtbBlocks = document.getElementById('mtbBlocks');
+        if (mtbBlocks) mtbBlocks.textContent = `${this.currentBlock + 1}-${endBlock}/${this.totalBlocks}`;
         document.getElementById('prevBlock').disabled = this.currentBlock === 0;
         document.getElementById('nextBlock').disabled =
             this.currentBlock + this.visibleBlocks >= this.totalBlocks;
@@ -614,6 +640,9 @@ class DrumMachine {
         this.isPlaying = true;
         document.getElementById('playBtn').textContent = '⏸ Pause';
         document.getElementById('playBtn').classList.add('playing');
+        const mobilePlay = document.getElementById('mobilePlayBtn');
+        if (mobilePlay) mobilePlay.textContent = '⏸';
+        document.body.classList.add('is-playing');
 
         if (this.audioContext.state === 'suspended') await this.audioContext.resume();
 
@@ -629,6 +658,9 @@ class DrumMachine {
         this.isPlaying = false;
         document.getElementById('playBtn').textContent = '▶ Play';
         document.getElementById('playBtn').classList.remove('playing');
+        const mobilePlay = document.getElementById('mobilePlayBtn');
+        if (mobilePlay) mobilePlay.textContent = '▶';
+        document.body.classList.remove('is-playing');
         clearInterval(this.intervalId);
         this.clearPlayingIndicators();
     }
