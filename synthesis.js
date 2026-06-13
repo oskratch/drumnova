@@ -328,14 +328,16 @@ function createSyntheticSound(audioContext, type) {
 
     // ── FX ────────────────────────────────────────────────────────────────────
     if (type === 'fx') {
-        const len = Math.floor(sr * 0.35);
+        const len = Math.floor(sr * 0.07);
         const buf = audioContext.createBuffer(1, len, sr);
         const d = buf.getChannelData(0);
-        let phase = 0;
+        let p1 = 0, p2 = 0;
         for (let i = 0; i < len; i++) {
             const t = i / sr;
-            phase += (2 * Math.PI * 80 * Math.pow(3000 / 80, t / 0.35)) * dt;
-            d[i] = Math.sin(phase) * Math.exp(-t / 0.28) * 0.65;
+            p1 += 2 * Math.PI * 2500 * dt;
+            p2 += 2 * Math.PI * 3700 * dt;
+            const env = Math.exp(-t / 0.013);
+            d[i] = (Math.sin(p1) * 0.6 + Math.sin(p2) * 0.4) * env * 0.85;
         }
         return buf;
     }
