@@ -3,99 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DrumNova - Drum Machine</title>
-    <link rel="stylesheet" href="style.css?v=1.0.2">
+    <title>DrumNova</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <div class="drum-machine">
-            <!-- Header -->
-            <div class="header">
-                <h1 class="logo">DrumNova</h1>
-            </div>
 
-            <!-- Tabs Navigation -->
-            <div class="tabs-navigation">
-                <button class="tab-btn active" data-tab="pattern">PATTERN</button>
-                <button class="tab-btn" data-tab="bpm">BPM</button>
-                <button class="tab-btn" data-tab="swing">SWING</button>
-                <button class="tab-btn" data-tab="reverb">REVERB</button>
-            </div>
-
-            <!-- Tab Content -->
-            <div class="tab-content active" id="tab-pattern">
-                <!-- Save/Load Pattern Section -->
-                <div class="save-load-section">
-                    <label>Pattern:</label>
-                    <button id="savePattern" class="btn btn-secondary">💾 Save</button>
-                    <button id="loadFile" class="btn btn-secondary">📁 Load</button>
-                    <input type="file" id="fileInput" accept=".json,.drumnova" style="display: none;">
+            <!-- ── Header Plate ─────────────────────────── -->
+            <div class="header-plate">
+                <div class="logo-section">
+                    <div class="screw-row">
+                        <span class="screw"></span>
+                        <span class="screw"></span>
+                    </div>
+                    <h1 class="logo">DrumNova</h1>
+                    <span class="logo-sub">DRUM MACHINE</span>
                 </div>
-
-                <!-- Demo Patterns Section -->
-                <div class="pattern-section">
-                    <label for="patternSelect">Demo Patterns:</label>
-                    <select id="patternSelect">
-                        <!-- Populated dynamically from JS -->
-                    </select>
-                    <button id="loadPattern" class="btn btn-secondary">Load</button>
+                <div class="transport">
+                    <button id="playBtn" class="btn-transport btn-play">&#9654; PLAY</button>
+                    <button id="stopBtn" class="btn-transport btn-stop">&#9632; STOP</button>
+                    <button id="clearBtn" class="btn-transport btn-clear">CLR</button>
                 </div>
             </div>
 
-            <div class="tab-content" id="tab-bpm">
-                <div class="bpm-section">
-                    <label for="bpmSlider">BPM: <span id="bpmValue">120</span></label>
-                    <input type="range" id="bpmSlider" min="60" max="200" value="120" step="1">
+            <!-- ── Controls Panel ───────────────────────── -->
+            <div class="controls-panel">
+                <div class="ctrl-group">
+                    <span class="ctrl-label">BPM</span>
+                    <span class="ctrl-value" id="bpmValue">120</span>
+                    <input type="range" class="ctrl-slider" id="bpmSlider" min="60" max="200" value="120" step="1">
+                </div>
+                <div class="ctrl-sep"></div>
+                <div class="ctrl-group">
+                    <span class="ctrl-label">SWING</span>
+                    <span class="ctrl-value" id="swingValue">0</span>
+                    <input type="range" class="ctrl-slider" id="swingSlider" min="0" max="75" value="0" step="1">
+                </div>
+                <div class="ctrl-sep"></div>
+                <div class="ctrl-group">
+                    <span class="ctrl-label">REVERB</span>
+                    <span class="ctrl-value" id="reverbValue">0</span>
+                    <input type="range" class="ctrl-slider" id="reverbSend" min="0" max="100" value="0" step="1">
+                </div>
+                <div class="ctrl-sep"></div>
+                <div class="ctrl-group ctrl-group--blocks">
+                    <span class="ctrl-label">BLOCKS</span>
+                    <div class="btn-row">
+                        <button class="seg-btn block-btn active" data-blocks="1">1</button>
+                        <button class="seg-btn block-btn" data-blocks="2">2</button>
+                        <button class="seg-btn block-btn" data-blocks="4">4</button>
+                        <button class="seg-btn block-btn" data-blocks="8">8</button>
+                    </div>
+                </div>
+                <div class="ctrl-sep"></div>
+                <div class="ctrl-group ctrl-group--view">
+                    <span class="ctrl-label">VIEW</span>
+                    <div class="btn-row">
+                        <button class="seg-btn view-btn" data-view="1">1</button>
+                        <button class="seg-btn view-btn active" data-view="2">2</button>
+                        <button class="seg-btn view-btn" data-view="4">4</button>
+                    </div>
+                </div>
+                <div class="ctrl-sep"></div>
+                <div class="ctrl-nav">
+                    <button id="prevBlock" class="nav-btn">&#9664;</button>
+                    <span id="blockIndicator" class="block-indicator">1–2 / 1</span>
+                    <button id="nextBlock" class="nav-btn">&#9654;</button>
                 </div>
             </div>
 
-            <div class="tab-content" id="tab-swing">
-                <div class="swing-section">
-                    <label for="swingSlider">Swing: <span id="swingValue">0</span>%</label>
-                    <input type="range" id="swingSlider" min="0" max="75" value="0" step="1">
-                    <div class="hint">💡 Tip: Click = normal | Shift+Click = accent | Alt+Click = ghost note</div>
-                </div>
+            <!-- ── Pattern Bar ──────────────────────────── -->
+            <div class="pattern-bar">
+                <span class="ctrl-label">PATTERN</span>
+                <select id="patternSelect" class="pattern-select">
+                    <!-- Populated by JS -->
+                </select>
+                <button id="loadPattern" class="btn-bar">LOAD</button>
+                <div class="bar-sep"></div>
+                <button id="savePattern" class="btn-bar">SAVE</button>
+                <button id="loadFile" class="btn-bar">OPEN</button>
+                <input type="file" id="fileInput" accept=".json,.drumnova" style="display:none">
             </div>
 
-            <div class="tab-content" id="tab-reverb">
-                <div class="reverb-section">
-                    <label for="reverbSend">Reverb Send: <span id="reverbValue">0</span>%</label>
-                    <input type="range" id="reverbSend" min="0" max="100" value="0" step="1">
-                    <div class="hint">💡 Adds spatial depth to your drums</div>
-                </div>
-            </div>
-
-            <!-- Controls -->
-            <div class="controls-main">
-                <button id="playBtn" class="btn btn-play">▶ Play</button>
-                <button id="stopBtn" class="btn btn-stop">■ Stop</button>
-                <button id="clearBtn" class="btn btn-clear">Clear</button>
-            </div>
-
-            <!-- Block Control -->
-            <div class="block-section">
-                <label>Total Blocks:</label>
-                <div class="block-buttons">
-                    <button class="block-btn active" data-blocks="1">1</button>
-                    <button class="block-btn" data-blocks="2">2</button>
-                    <button class="block-btn" data-blocks="4">4</button>
-                    <button class="block-btn" data-blocks="8">8</button>
-                </div>
-                <span class="separator">|</span>
-                <label>View:</label>
-                <div class="view-buttons">
-                    <button class="view-btn" data-view="1">1</button>
-                    <button class="view-btn active" data-view="2">2</button>
-                    <button class="view-btn" data-view="4">4</button>
-                </div>
-                <div class="block-navigation">
-                    <button id="prevBlock" class="nav-btn">◄</button>
-                    <span id="blockIndicator">Blocks 1-2/1</span>
-                    <button id="nextBlock" class="nav-btn">►</button>
-                </div>
-            </div>
-
-            <!-- Mobile Channel Settings Modal -->
+            <!-- ── Mobile Channel Modal ──────────────────── -->
             <div id="channelModal" class="channel-modal">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -103,19 +97,17 @@
                         <button class="modal-close">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <div class="modal-instrument-selector">
-                            <label>Sound:</label>
-                            <select id="modalSoundSelector" class="sound-selector-modal">
-                                <!-- Options will be populated by JS -->
-                            </select>
+                        <div class="modal-row">
+                            <label>Sound</label>
+                            <select id="modalSoundSelector" class="sound-selector-modal"></select>
                         </div>
-                        <button id="modalPreviewBtn" class="btn-modal-preview">▶ Preview Sound</button>
-                        <div class="modal-mute">
-                            <label>Mute:</label>
-                            <button id="modalMuteBtn" class="btn-modal-mute">🔊</button>
+                        <button id="modalPreviewBtn" class="btn-modal-preview">&#9654; Preview</button>
+                        <div class="modal-row">
+                            <label>Mute</label>
+                            <button id="modalMuteBtn" class="btn-modal-mute">&#128266;</button>
                         </div>
-                        <div class="modal-volume">
-                            <label>Volume:</label>
+                        <div class="modal-row modal-row--col">
+                            <label>Volume</label>
                             <input type="range" id="modalVolumeSlider" min="0" max="100" value="70" step="1">
                             <span id="modalVolumeValue">70%</span>
                         </div>
@@ -123,22 +115,27 @@
                 </div>
             </div>
 
-            <!-- Sequencer Grid -->
+            <!-- ── Sequencer ────────────────────────────── -->
             <div class="sequencer">
+
+                <!-- Desktop channel labels -->
                 <div class="channel-labels">
                     <div class="label-header">INSTRUMENT</div>
-                    <div class="channel-label">
-                        <button class="mobile-settings-btn" data-channel="0" title="Channel settings">⚙</button>
-                        <button class="preview-btn" data-channel="0" title="Preview sound">▶</button>
-                        <button class="mute-btn" data-channel="0" title="Mute channel">🔊</button>
-                        <div class="volume-dial" data-channel="0" title="Volume">
-                            <svg width="30" height="30" viewBox="0 0 30 30">
-                                <circle cx="15" cy="15" r="12" fill="#2a2a3e" stroke="#667eea" stroke-width="2"/>
-                                <line class="dial-indicator" x1="15" y1="15" x2="15" y2="6" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
+
+                    <div class="channel-label" data-channel="0">
+                        <button class="mobile-settings-btn" data-channel="0" title="Settings">&#9881;</button>
+                        <button class="preview-btn" data-channel="0" title="Preview">&#9654;</button>
+                        <button class="mute-btn" data-channel="0" title="Mute">&#128266;</button>
+                        <div class="vol-wrap">
+                            <div class="volume-dial" data-channel="0" title="Volume">
+                                <svg width="30" height="30" viewBox="0 0 30 30">
+                                    <circle cx="15" cy="15" r="12" stroke-width="2"/>
+                                    <line class="dial-indicator" x1="15" y1="15" x2="15" y2="5" stroke-width="2.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
                         </div>
                         <div class="label-content">
-                            <span class="instrument-name">Kick</span>
+                            <span class="instrument-name">KICK</span>
                             <select class="sound-selector" data-channel="0">
                                 <option value="kick">Kick 808</option>
                                 <option value="kick2">Kick Vintage</option>
@@ -148,18 +145,21 @@
                             </select>
                         </div>
                     </div>
-                    <div class="channel-label">
-                        <button class="mobile-settings-btn" data-channel="1" title="Channel settings">⚙</button>
-                        <button class="preview-btn" data-channel="1" title="Preview sound">▶</button>
-                        <button class="mute-btn" data-channel="1" title="Mute channel">🔊</button>
-                        <div class="volume-dial" data-channel="1" title="Volume">
-                            <svg width="30" height="30" viewBox="0 0 30 30">
-                                <circle cx="15" cy="15" r="12" fill="#2a2a3e" stroke="#667eea" stroke-width="2"/>
-                                <line class="dial-indicator" x1="15" y1="15" x2="15" y2="6" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
+
+                    <div class="channel-label" data-channel="1">
+                        <button class="mobile-settings-btn" data-channel="1" title="Settings">&#9881;</button>
+                        <button class="preview-btn" data-channel="1" title="Preview">&#9654;</button>
+                        <button class="mute-btn" data-channel="1" title="Mute">&#128266;</button>
+                        <div class="vol-wrap">
+                            <div class="volume-dial" data-channel="1" title="Volume">
+                                <svg width="30" height="30" viewBox="0 0 30 30">
+                                    <circle cx="15" cy="15" r="12" stroke-width="2"/>
+                                    <line class="dial-indicator" x1="15" y1="15" x2="15" y2="5" stroke-width="2.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
                         </div>
                         <div class="label-content">
-                            <span class="instrument-name">Snare</span>
+                            <span class="instrument-name">SNARE</span>
                             <select class="sound-selector" data-channel="1">
                                 <option value="snare">Snare 808</option>
                                 <option value="snare2">Snare Vintage</option>
@@ -169,18 +169,21 @@
                             </select>
                         </div>
                     </div>
-                    <div class="channel-label">
-                        <button class="mobile-settings-btn" data-channel="2" title="Channel settings">⚙</button>
-                        <button class="preview-btn" data-channel="2" title="Preview sound">▶</button>
-                        <button class="mute-btn" data-channel="2" title="Mute channel">🔊</button>
-                        <div class="volume-dial" data-channel="2" title="Volume">
-                            <svg width="30" height="30" viewBox="0 0 30 30">
-                                <circle cx="15" cy="15" r="12" fill="#2a2a3e" stroke="#667eea" stroke-width="2"/>
-                                <line class="dial-indicator" x1="15" y1="15" x2="15" y2="6" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
+
+                    <div class="channel-label" data-channel="2">
+                        <button class="mobile-settings-btn" data-channel="2" title="Settings">&#9881;</button>
+                        <button class="preview-btn" data-channel="2" title="Preview">&#9654;</button>
+                        <button class="mute-btn" data-channel="2" title="Mute">&#128266;</button>
+                        <div class="vol-wrap">
+                            <div class="volume-dial" data-channel="2" title="Volume">
+                                <svg width="30" height="30" viewBox="0 0 30 30">
+                                    <circle cx="15" cy="15" r="12" stroke-width="2"/>
+                                    <line class="dial-indicator" x1="15" y1="15" x2="15" y2="5" stroke-width="2.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
                         </div>
                         <div class="label-content">
-                            <span class="instrument-name">HiHat</span>
+                            <span class="instrument-name">HIHAT</span>
                             <select class="sound-selector" data-channel="2">
                                 <option value="hihat">HiHat Closed</option>
                                 <option value="hihat2">HiHat Open</option>
@@ -190,18 +193,21 @@
                             </select>
                         </div>
                     </div>
-                    <div class="channel-label">
-                        <button class="mobile-settings-btn" data-channel="3" title="Channel settings">⚙</button>
-                        <button class="preview-btn" data-channel="3" title="Preview sound">▶</button>
-                        <button class="mute-btn" data-channel="3" title="Mute channel">🔊</button>
-                        <div class="volume-dial" data-channel="3" title="Volume">
-                            <svg width="30" height="30" viewBox="0 0 30 30">
-                                <circle cx="15" cy="15" r="12" fill="#2a2a3e" stroke="#667eea" stroke-width="2"/>
-                                <line class="dial-indicator" x1="15" y1="15" x2="15" y2="6" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
+
+                    <div class="channel-label" data-channel="3">
+                        <button class="mobile-settings-btn" data-channel="3" title="Settings">&#9881;</button>
+                        <button class="preview-btn" data-channel="3" title="Preview">&#9654;</button>
+                        <button class="mute-btn" data-channel="3" title="Mute">&#128266;</button>
+                        <div class="vol-wrap">
+                            <div class="volume-dial" data-channel="3" title="Volume">
+                                <svg width="30" height="30" viewBox="0 0 30 30">
+                                    <circle cx="15" cy="15" r="12" stroke-width="2"/>
+                                    <line class="dial-indicator" x1="15" y1="15" x2="15" y2="5" stroke-width="2.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
                         </div>
                         <div class="label-content">
-                            <span class="instrument-name">Clap</span>
+                            <span class="instrument-name">CLAP</span>
                             <select class="sound-selector" data-channel="3">
                                 <option value="clap">Clap Sharp</option>
                                 <option value="clap2">Clap Room</option>
@@ -211,18 +217,21 @@
                             </select>
                         </div>
                     </div>
-                    <div class="channel-label">
-                        <button class="mobile-settings-btn" data-channel="4" title="Channel settings">⚙</button>
-                        <button class="preview-btn" data-channel="4" title="Preview sound">▶</button>
-                        <button class="mute-btn" data-channel="4" title="Mute channel">🔊</button>
-                        <div class="volume-dial" data-channel="4" title="Volume">
-                            <svg width="30" height="30" viewBox="0 0 30 30">
-                                <circle cx="15" cy="15" r="12" fill="#2a2a3e" stroke="#667eea" stroke-width="2"/>
-                                <line class="dial-indicator" x1="15" y1="15" x2="15" y2="6" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
+
+                    <div class="channel-label" data-channel="4">
+                        <button class="mobile-settings-btn" data-channel="4" title="Settings">&#9881;</button>
+                        <button class="preview-btn" data-channel="4" title="Preview">&#9654;</button>
+                        <button class="mute-btn" data-channel="4" title="Mute">&#128266;</button>
+                        <div class="vol-wrap">
+                            <div class="volume-dial" data-channel="4" title="Volume">
+                                <svg width="30" height="30" viewBox="0 0 30 30">
+                                    <circle cx="15" cy="15" r="12" stroke-width="2"/>
+                                    <line class="dial-indicator" x1="15" y1="15" x2="15" y2="5" stroke-width="2.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
                         </div>
                         <div class="label-content">
-                            <span class="instrument-name">Tom</span>
+                            <span class="instrument-name">TOM</span>
                             <select class="sound-selector" data-channel="4">
                                 <option value="tom">Tom Low</option>
                                 <option value="tom2">Tom Mid</option>
@@ -231,18 +240,21 @@
                             </select>
                         </div>
                     </div>
-                    <div class="channel-label">
-                        <button class="mobile-settings-btn" data-channel="5" title="Channel settings">⚙</button>
-                        <button class="preview-btn" data-channel="5" title="Preview sound">▶</button>
-                        <button class="mute-btn" data-channel="5" title="Mute channel">🔊</button>
-                        <div class="volume-dial" data-channel="5" title="Volume">
-                            <svg width="30" height="30" viewBox="0 0 30 30">
-                                <circle cx="15" cy="15" r="12" fill="#2a2a3e" stroke="#667eea" stroke-width="2"/>
-                                <line class="dial-indicator" x1="15" y1="15" x2="15" y2="6" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
+
+                    <div class="channel-label" data-channel="5">
+                        <button class="mobile-settings-btn" data-channel="5" title="Settings">&#9881;</button>
+                        <button class="preview-btn" data-channel="5" title="Preview">&#9654;</button>
+                        <button class="mute-btn" data-channel="5" title="Mute">&#128266;</button>
+                        <div class="vol-wrap">
+                            <div class="volume-dial" data-channel="5" title="Volume">
+                                <svg width="30" height="30" viewBox="0 0 30 30">
+                                    <circle cx="15" cy="15" r="12" stroke-width="2"/>
+                                    <line class="dial-indicator" x1="15" y1="15" x2="15" y2="5" stroke-width="2.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
                         </div>
                         <div class="label-content">
-                            <span class="instrument-name">Perc</span>
+                            <span class="instrument-name">PERC</span>
                             <select class="sound-selector" data-channel="5">
                                 <option value="perc">Perc Shaker</option>
                                 <option value="perc2">Perc Cowbell</option>
@@ -252,18 +264,21 @@
                             </select>
                         </div>
                     </div>
-                    <div class="channel-label">
-                        <button class="mobile-settings-btn" data-channel="6" title="Channel settings">⚙</button>
-                        <button class="preview-btn" data-channel="6" title="Preview sound">▶</button>
-                        <button class="mute-btn" data-channel="6" title="Mute channel">🔊</button>
-                        <div class="volume-dial" data-channel="6" title="Volume">
-                            <svg width="30" height="30" viewBox="0 0 30 30">
-                                <circle cx="15" cy="15" r="12" fill="#2a2a3e" stroke="#667eea" stroke-width="2"/>
-                                <line class="dial-indicator" x1="15" y1="15" x2="15" y2="6" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
+
+                    <div class="channel-label" data-channel="6">
+                        <button class="mobile-settings-btn" data-channel="6" title="Settings">&#9881;</button>
+                        <button class="preview-btn" data-channel="6" title="Preview">&#9654;</button>
+                        <button class="mute-btn" data-channel="6" title="Mute">&#128266;</button>
+                        <div class="vol-wrap">
+                            <div class="volume-dial" data-channel="6" title="Volume">
+                                <svg width="30" height="30" viewBox="0 0 30 30">
+                                    <circle cx="15" cy="15" r="12" stroke-width="2"/>
+                                    <line class="dial-indicator" x1="15" y1="15" x2="15" y2="5" stroke-width="2.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
                         </div>
                         <div class="label-content">
-                            <span class="instrument-name">Cymbal</span>
+                            <span class="instrument-name">CYMBAL</span>
                             <select class="sound-selector" data-channel="6">
                                 <option value="cymbal">Cymbal Crash</option>
                                 <option value="cymbal2">Cymbal Ride</option>
@@ -272,15 +287,18 @@
                             </select>
                         </div>
                     </div>
-                    <div class="channel-label">
-                        <button class="mobile-settings-btn" data-channel="7" title="Channel settings">⚙</button>
-                        <button class="preview-btn" data-channel="7" title="Preview sound">▶</button>
-                        <button class="mute-btn" data-channel="7" title="Mute channel">🔊</button>
-                        <div class="volume-dial" data-channel="7" title="Volume">
-                            <svg width="30" height="30" viewBox="0 0 30 30">
-                                <circle cx="15" cy="15" r="12" fill="#2a2a3e" stroke="#667eea" stroke-width="2"/>
-                                <line class="dial-indicator" x1="15" y1="15" x2="15" y2="6" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
+
+                    <div class="channel-label" data-channel="7">
+                        <button class="mobile-settings-btn" data-channel="7" title="Settings">&#9881;</button>
+                        <button class="preview-btn" data-channel="7" title="Preview">&#9654;</button>
+                        <button class="mute-btn" data-channel="7" title="Mute">&#128266;</button>
+                        <div class="vol-wrap">
+                            <div class="volume-dial" data-channel="7" title="Volume">
+                                <svg width="30" height="30" viewBox="0 0 30 30">
+                                    <circle cx="15" cy="15" r="12" stroke-width="2"/>
+                                    <line class="dial-indicator" x1="15" y1="15" x2="15" y2="5" stroke-width="2.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
                         </div>
                         <div class="label-content">
                             <span class="instrument-name">FX</span>
@@ -288,59 +306,42 @@
                                 <option value="fx">FX Laser</option>
                                 <option value="fx2">FX Sweep</option>
                                 <option value="fx3">FX Stab</option>
-                                <option value="fx4">FX Noise</option>
+                                <option value="fx4">FX Zap</option>
                                 <option value="fx5">FX Bell</option>
                             </select>
                         </div>
                     </div>
-                </div>
+                </div><!-- /.channel-labels -->
 
-                <!-- Mobile Settings Column (only visible on mobile) -->
+                <!-- Mobile settings column -->
                 <div class="mobile-settings-column">
                     <div class="mobile-header"></div>
-                    <button class="mobile-channel-btn" data-channel="0" title="Kick settings">⚙</button>
-                    <button class="mobile-channel-btn" data-channel="1" title="Snare settings">⚙</button>
-                    <button class="mobile-channel-btn" data-channel="2" title="HiHat settings">⚙</button>
-                    <button class="mobile-channel-btn" data-channel="3" title="Clap settings">⚙</button>
-                    <button class="mobile-channel-btn" data-channel="4" title="Tom settings">⚙</button>
-                    <button class="mobile-channel-btn" data-channel="5" title="Perc settings">⚙</button>
-                    <button class="mobile-channel-btn" data-channel="6" title="Cymbal settings">⚙</button>
-                    <button class="mobile-channel-btn" data-channel="7" title="FX settings">⚙</button>
+                    <button class="mobile-channel-btn" data-channel="0" title="Kick">&#9881;</button>
+                    <button class="mobile-channel-btn" data-channel="1" title="Snare">&#9881;</button>
+                    <button class="mobile-channel-btn" data-channel="2" title="HiHat">&#9881;</button>
+                    <button class="mobile-channel-btn" data-channel="3" title="Clap">&#9881;</button>
+                    <button class="mobile-channel-btn" data-channel="4" title="Tom">&#9881;</button>
+                    <button class="mobile-channel-btn" data-channel="5" title="Perc">&#9881;</button>
+                    <button class="mobile-channel-btn" data-channel="6" title="Cymbal">&#9881;</button>
+                    <button class="mobile-channel-btn" data-channel="7" title="FX">&#9881;</button>
                 </div>
 
+                <!-- Grid -->
                 <div class="grid-container">
                     <div class="step-indicators">
-                        <div class="indicator-header"></div>
-                        <div class="step-numbers">
-                            <!-- Numbers generated by JavaScript -->
-                        </div>
+                        <div class="step-numbers"></div>
                     </div>
-
-                    <!-- Grid will be generated by JavaScript -->
                     <div id="sequencerGrid" class="grid"></div>
                 </div>
-            </div>
 
-            <!-- Info Panel -->
-            <div class="info-panel">
-                <p><strong>Instructions:</strong></p>
-                <ul>
-                    <li>Click on pads to activate/deactivate beats</li>
-                    <li>Select different sounds for each instrument</li>
-                    <li>Choose 1, 2, 4, or 8 blocks for longer patterns</li>
-                    <li>Navigate between blocks with ◄ ► buttons</li>
-                    <li>Load demo patterns to get started quickly</li>
-                    <li>Adjust BPM with the slider</li>
-                    <li>Play travels through all active blocks in sequence</li>
-                </ul>
-            </div>
-        </div>
+            </div><!-- /.sequencer -->
 
-        <!-- Footer -->
+        </div><!-- /.drum-machine -->
+
         <footer class="footer">
             <p>Developed by <a href="https://oscarperiche.com" target="_blank">Oscar Periche</a></p>
         </footer>
-    </div>
+    </div><!-- /.container -->
 
     <script src="patterns.js"></script>
     <script src="synthesis.js"></script>
