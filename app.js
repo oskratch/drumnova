@@ -1,6 +1,3 @@
-import { demoPatterns } from './patterns.js';
-import { makeSaturationCurve, createReverbImpulse, createSyntheticSound } from './synthesis.js';
-
 class DrumMachine {
     constructor() {
         this.channels = 8;

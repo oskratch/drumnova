@@ -1,4 +1,4 @@
-export const demoPatterns = {
+const demoPatterns = {
     basic: {
         name: 'Rock Steady',
         bpm: 120,

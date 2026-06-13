@@ -1,4 +1,4 @@
-export function makeSaturationCurve(amount) {
+function makeSaturationCurve(amount) {
     const samples = 256;
     const curve = new Float32Array(samples);
     for (let i = 0; i < samples; i++) {
@@ -8,7 +8,7 @@ export function makeSaturationCurve(amount) {
     return curve;
 }
 
-export function createReverbImpulse(audioContext, duration) {
+function createReverbImpulse(audioContext, duration) {
     const sampleRate = audioContext.sampleRate;
     const length = sampleRate * duration;
     const impulse = audioContext.createBuffer(2, length, sampleRate);
@@ -61,7 +61,7 @@ export function createReverbImpulse(audioContext, duration) {
     return impulse;
 }
 
-export function createSyntheticSound(audioContext, type) {
+function createSyntheticSound(audioContext, type) {
     const sr = audioContext.sampleRate;
     const dt = 1 / sr;
 
