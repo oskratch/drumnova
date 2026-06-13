@@ -1,266 +1,119 @@
-# DrumNova - Redrum-Style Drum Machine
+# DrumNova - Drum Machine
 
 🌐 **[Try the live demo](https://drumnova.oscarperiche.com)**
 
-A personal experiment building an interactive drum machine inspired by Redrum, fully functional in the browser. This is just a fun side project to explore the Web Audio API and create something useful for making beats.
+A browser-based drum machine inspired by classic hardware sequencers like the TR-808 and Redrum. Built entirely with vanilla JS, CSS, and HTML — no frameworks, no dependencies, no build step.
 
-## 🎵 Features
+## Features
 
-- **16 steps x 8 channels** sequencer grid with multi-block view (1/2/4 blocks visible at once)
-- **Block system**: Choose 1, 2, 4, or 8 blocks for extended patterns (up to 128 steps total)
-- **Tabbed interface**: Organized controls with BPM, SWING, PATTERN, and REVERB tabs to save vertical space
-- **Swing/Shuffle control**: Adjustable groove (0-75%) to add that human feel
-- **Velocity per pad**: Ghost notes, normal hits, and accents for dynamic expression
-- **Reverb effect**: Master reverb with send control (0-100%) for spatial depth
-- **Block navigation**: Switch between blocks to program different sections
-- **Seamless playback**: Play travels through all active blocks in sequence
-- **Demo patterns** preconfigured (Rock Steady, Funk Soul, Boom Bap, Industrial Pulse, New Wave Icon, Four to the Floor, Tension Build, Poly Rhythm)
-- **8 instrument channels**: Kick, Snare, HiHat, Clap, Tom, Perc, Cymbal, FX
-- **Multiple sound variations**: 4-5 different sounds per instrument with enhanced synthesis
-- **Improved synthesis**: 808-style kicks with pitch envelopes, realistic snares with noise/tone balance
-- **Mute buttons**: 🔊/🔇 per channel to silence individual instruments
-- **Volume dials**: Individual volume control per channel with rotary knobs
-- **BPM control** adjustable (60-200 BPM)
-- **Keyboard shortcuts**: Space = play/pause, ESC = stop, 1-8 = mute channels, arrows = navigate blocks
-- **Master bus compressor**: Professional sound cohesion and punch
-- **Save/Load patterns**: Download and upload your patterns as JSON files with all settings preserved
-- **Responsive design**: Works on desktop, tablet, and mobile with horizontal scroll
-- **Visual interface** hardware-style with responsive colors
-- **Web Audio API** for low-latency audio playback
+- **Hardware-style UI** — dark matte panel aesthetic with per-channel LED color coding
+- **8 instrument channels** — Kick, Snare, HiHat, Clap, Tom, Perc, Cymbal, FX, each with its own accent color
+- **5 sound variants per channel** — 40 procedurally synthesised sounds via Web Audio API (no audio files)
+- **16 steps × 8 blocks** — up to 128-step patterns; choose 1/2/4/8 active blocks
+- **Multi-block view** — see and edit 1, 2, or 4 blocks at once
+- **Velocity per pad** — ghost notes (Alt+click), normal hits (click), accents (Shift+click)
+- **Swing/Shuffle** — adjustable groove from 0 to 75%
+- **Reverb effect** — synthetic convolution reverb with send control
+- **Master bus** — WaveShaper saturation + dynamics compressor for punch and warmth
+- **Mute per channel** — keyboard shortcuts 1–8
+- **Volume dial per channel** — drag vertically to adjust
+- **Save/Load patterns** — JSON export with full settings (BPM, swing, reverb, sound selections, velocities)
+- **8 demo patterns** — Rock Steady, Funk Soul, Boom Bap, Industrial Pulse, New Wave Icon, Four to the Floor, Tension Build, Poly Rhythm
+- **Mobile-optimised** — fixed transport bar at bottom, collapsible controls, 40px touch targets, per-channel settings modal
 
-## 🚀 Quick Start
+## Quick Start
 
-1. Open `index.html` directly in your browser
-2. Click on pads to create your pattern
-3. Press **Play** to hear it
-4. Adjust **BPM** with the slider
-5. Load **demo patterns** to get started quickly
+1. Open `index.html` in a browser (no server needed)
+2. Click pads to build your pattern
+3. Press **Play** or hit **Space**
+4. Load a demo pattern to get started quickly
 
-## 🎹 How It Works
+> To avoid `file://` CORS issues with some browsers, serve locally:
+> ```bash
+> python -m http.server 8000
+> ```
 
-### Structure
-- Each **row** = an instrument (Kick, Snare, HiHat, Clap, Tom, Perc, Cymbal, FX)
-- Each **column** = a beat step
-- Each **block** = 16 steps of all instruments
-- **Blue pads** = activated
-- **Green/yellow pads** = currently playing
+## Controls
 
-### Controls
+**Transport** — Play/Pause (`Space`), Stop (`Esc`), Clear (`Ctrl+C`)
 
-**Tabs**: Use the tab buttons to switch between different control sections:
-- **BPM Tab**: Adjust tempo (60-200 BPM)
-- **SWING Tab**: Add groove/shuffle (0-75%) + velocity tips
-- **PATTERN Tab**: Save/Load patterns and load demo patterns
-- **REVERB Tab**: Add spatial depth with reverb send (0-100%)
+**Pads**
+- Click → normal hit (70% velocity)
+- Shift+Click → accent (100%, gold glow)
+- Alt+Click → ghost note (30%, faded)
 
-**Main Controls**:
-- **Play/Pause**: Start or pause playback (shortcut: **Space**)
-- **Stop**: Stop and return to beginning (shortcut: **ESC**)
-- **Clear**: Erase current visible blocks' patterns (shortcut: **Ctrl+C**)
+**Blocks** — set 1/2/4/8 total blocks; navigate with `←` `→` arrows
 
-**Channel Controls**:
-- **Sound selectors**: Choose different sounds for each instrument (4-5 variations each)
-- **Mute buttons**: 🔊/🔇 per channel to silence individual instruments during playback (shortcuts: **1-8**)
-- **Volume dials**: Drag vertically to adjust individual channel volume (0-100%)
-- **▶ Preview buttons**: Test individual instrument sounds (plays currently selected variant)
+**View** — show 1, 2, or 4 blocks simultaneously for easier editing
 
-**Block Controls**:
-- **Block buttons (1/2/4/8)**: Set how many blocks are active
-- **View buttons (1/2/4)**: Set how many blocks are visible at once (default: 2)
-- **◄ ► Navigation**: Switch between visible blocks (shortcuts: **Left/Right arrows**)
+**Channel shortcuts** — keys `1`–`8` toggle mute per channel
 
-### Velocity System
-Click pads with different modifier keys for dynamics:
-- **Normal click**: 70% velocity (standard hit)
-- **Shift + click**: 100% velocity (accent - loud, emphasized hit with gold glow)
-- **Alt + click**: 30% velocity (ghost note - quiet, subtle hit with darker color)
+## Architecture
 
-This allows for realistic, musical patterns with dynamics instead of robotic, same-volume hits.
+Three plain JS files, no bundler:
 
-### Keyboard Shortcuts
-- **Space**: Play / Pause
-- **ESC**: Stop
-- **Ctrl+C**: Clear pattern
-- **1-8**: Toggle mute for channels 1-8
-- **Left/Right arrows**: Navigate between blocks
+| File | Purpose |
+|---|---|
+| `patterns.js` | 8 demo patterns as plain data |
+| `synthesis.js` | All drum synthesis — kicks, snares, hi-hats, cymbals, FX |
+| `app.js` | `DrumMachine` class — sequencer, UI, audio routing |
 
-### Multi-Block View
-By default, **2 blocks** are visible simultaneously, allowing you to see and edit longer patterns at once:
-- Click **View: 1/2/4** buttons to change how many blocks are shown
-- Visual separators (gold lines) mark block boundaries
-- Navigation arrows scroll through blocks
-- All editing works seamlessly across visible blocks
+Sequence state: `sequence[blockIndex][channel][step] = { active, velocity }`
 
-### Block System
-- **1 block** = 16 steps (basic patterns)
-- **2 blocks** = 32 steps (intro + verse, build-ups)
-- **4 blocks** = 64 steps (full song sections)
-- **8 blocks** = 128 steps (complete compositions)
+Signal chain: `BufferSource → GainNode → DryGain/ReverbSend → WaveShaper → Compressor → output`
 
-When loading demo patterns:
-- Short patterns (16 steps) fill all active blocks with the same pattern
-- Long patterns (32+ steps) automatically expand blocks to fit and distribute across them
+## Adding Demo Patterns
 
-## 🔧 Integrating Your Sound Library
+Add entries to `demoPatterns` in `patterns.js`:
 
-Currently uses synthetic sample sounds. To use your own sounds:
-
-### Option 1: Load sounds from JavaScript
-
-```javascript
-// In the browser console or in a custom script:
-const mySounds = [
-    { name: 'kick', url: 'path/to/kick.wav' },
-    { name: 'snare', url: 'path/to/snare.wav' },
-    { name: 'hihat', url: 'path/to/hihat.wav' },
-    { name: 'perc', url: 'path/to/perc.wav' }
-];
-
-loadSoundLibrary(mySounds);
-```
-
-### Option 2: Load individual sound
-
-```javascript
-drumMachine.loadSoundFile('kick', 'sounds/my-kick.wav');
-```
-
-### Recommended File Structure
-
-```
-DrumNova/
-├── index.html
-├── style.css
-├── app.js
-└── sounds/
-    ├── kick.wav
-    ├── kick2.wav
-    ├── snare.wav
-    ├── snare2.wav
-    ├── hihat.wav
-    ├── hihat2.wav
-    ├── perc.wav
-    └── perc2.wav
-```
-
-## 💾 Saving and Loading Patterns
-
-### Using the UI (Recommended)
-
-- Click **💾 Save** to download your current pattern as a JSON file
-- Click **📁 Load** to upload a previously saved pattern file
-
-The saved file includes:
-- Your pattern sequence (all blocks) with velocity data per pad
-- BPM setting
-- Swing/shuffle amount
-- Reverb send amount
-- Sound selections for each channel
-- Volume levels per channel
-- Mute states
-
-Pattern files are backward compatible - old patterns (boolean on/off) work with new features (velocity system).
-
-### Using JavaScript (Advanced)
-
-```javascript
-const myPattern = drumMachine.exportPattern();
-console.log(JSON.stringify(myPattern));
-// Copy the output and save it in a JSON file
-```
-
-### Import a pattern
-
-```javascript
-const patternData = {
+```js
+myPattern: {
     name: 'My Pattern',
     bpm: 128,
-    soundMap: ['kick', 'snare', 'hihat', 'perc'],
+    blocks: 2,                          // 1, 2, 4, or 8
+    soundSelections: [0,0,0,0,0,0,0,0], // sound variant index (0–4) per channel
     pattern: [
-        [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
-        [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
-        [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    ]
-};
-
-drumMachine.importPattern(patternData);
-```
-
-## 🎨 Customization
-
-### Modify visual style
-Edit `style.css` to change colors, sizes, gradients, etc.
-
-### Add more channels or steps
-In `app.js`, modify:
-```javascript
-this.channels = 8;  // Number of rows (instruments)
-this.steps = 16;    // Number of columns (beats per block)
-```
-
-### Add new demo patterns
-In `app.js`, inside `this.demoPatterns`, add:
-```javascript
-myNewPattern: {
-    name: 'My Pattern Name',
-    bpm: 120,                     // Recommended BPM
-    blocks: 1,                    // 1, 2, 4, or 8 blocks
-    soundSelections: [0,0,0,0,0,0,0,0], // Sound variant index per channel (0-4)
-    pattern: [
-        [1,0,0,0,...], // Kick (8 channels total)
-        [0,0,1,0,...], // Snare
-        [1,1,1,1,...], // HiHat
-        [0,0,0,0,...], // Clap
-        [0,0,0,0,...], // Tom
-        [0,0,0,0,...], // Perc
-        [0,0,0,0,...], // Cymbal
-        [0,0,0,0,...]  // FX
+        [1,0,0,0,...],  // Kick  — 8 rows × (blocks×16) columns
+        [0,0,1,0,...],  // Snare
+        [1,1,1,1,...],  // HiHat
+        [0,0,0,0,...],  // Clap
+        [0,0,0,0,...],  // Tom
+        [0,0,0,0,...],  // Perc
+        [0,0,0,0,...],  // Cymbal
+        [0,0,0,0,...],  // FX
     ]
 }
 ```
 
-**Pattern metadata:**
-- `bpm`: Sets the tempo automatically when loaded
-- `blocks`: Number of blocks (1=16 steps, 2=32, 4=64, 8=128)
-- `soundSelections`: Array of 8 indices (0-4) to select which sound variant for each channel
-- `pattern`: 2D array - 8 rows (channels) × steps (16 per block)
+## Save & Load
 
-## 🚧 Future Ideas (Maybe Someday)
+**UI** — SAVE downloads a `.json` file; OPEN loads it back. The file includes pattern data, BPM, swing, reverb, sound selections, volumes, and mute states.
 
-### Possible Extensions
-- ✅ Export/Import patterns with full settings
-- ✅ 8 channels with multiple sound variations
-- ✅ Block system (1/2/4/8 blocks = up to 128 steps)
-- ✅ Mute/Solo per channel (mute implemented)
-- ✅ Volume control per channel
-- ✅ Swing/Shuffle (0-75%)
-- ✅ Velocity per pad (ghost/normal/accent)
-- ✅ Multi-block view (see 1/2/4 blocks at once)
-- ✅ Keyboard shortcuts for workflow
-- ✅ Master bus compression for professional sound
-- ✅ Reverb effect with send control
-- ✅ Improved drum synthesis (808-style kicks and snares)
-- ✅ Tabbed interface to save vertical space
-- ⬜ Save to browser localStorage
-- ⬜ Copy/paste blocks
+**Console API**
+```js
+drumMachine.exportPattern()        // returns pattern object
+drumMachine.importPattern(data)    // loads pattern object
+drumMachine.loadSoundFile('kick', 'sounds/my-kick.wav')  // replace a synth sound
+```
+
+## What's Done / Planned
+
+- ✅ 8 channels, multiple sound variants, block system (up to 128 steps)
+- ✅ Velocity system (ghost / normal / accent)
+- ✅ Swing, reverb, master compression, WaveShaper saturation
+- ✅ TR-909-style metallic oscillator synthesis
+- ✅ Hardware-aesthetic UI with per-channel LED colours
+- ✅ Mobile layout with fixed transport bar and collapsible controls
+- ✅ Save/Load patterns as JSON
+- ✅ Keyboard shortcuts
+- ⬜ Per-channel EQ / filter
 - ⬜ Delay effect
-- ⬜ Per-channel EQ/filter
-- ⬜ Step subdivision (32 steps)
+- ⬜ Copy/paste blocks
 - ⬜ MIDI sync/export
+- ⬜ LocalStorage pattern persistence
 
-## 📝 License & Contributing
+## License
 
-This is a personal project shared under the MIT License - feel free to use it, modify it, or learn from it however you want.
+MIT — use it, fork it, learn from it.
 
-If you find bugs or have ideas to improve it, I'd love to hear about them! Open an issue or submit a pull request if you want to contribute. No formal process needed - this is just a casual project, so any feedback or improvements are welcome.
-
-## 🎯 About
-
-Made by Oscar Periche as a personal experiment to play with the Web Audio API and build something fun for making beats.
-
-Visit [oscarperiche.com](https://oscarperiche.com) to get to know me.
-
----
-
-**Enjoy creating your own beats! 🥁🎶**
+Made by [Oscar Periche](https://oscarperiche.com).
