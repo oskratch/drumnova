@@ -17,5 +17,8 @@ npm-debug.log*
 # Uncomment if you have a large sound library you don't want to commit
 # sounds/
 
+# Claude Code (local dev only)
+CLAUDE.md
+
 # Temporary files
 *.tmp
