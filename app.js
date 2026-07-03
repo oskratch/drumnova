@@ -46,6 +46,33 @@ class DrumMachine {
         this.setupKeyboardShortcuts();
         this.setupMobileTransport();
         await this.initAudio();
+        this.loadAutosave();
+        this.setupAutosave();
+    }
+
+    setupAutosave() {
+        window.addEventListener('beforeunload', () => this.saveAutosave());
+        setInterval(() => this.saveAutosave(), 5000);
+    }
+
+    saveAutosave() {
+        try {
+            localStorage.setItem('drumnova-autosave', JSON.stringify(this.exportPattern()));
+        } catch {
+            // localStorage unavailable (private browsing, quota, etc.) - autosave silently skipped
+        }
+    }
+
+    loadAutosave() {
+        try {
+            const saved = localStorage.getItem('drumnova-autosave');
+            if (saved) {
+                this.importPattern(JSON.parse(saved));
+                console.log('Restored autosaved pattern from previous session');
+            }
+        } catch {
+            // corrupt or inaccessible autosave data - ignore and start fresh
+        }
     }
 
     populatePatternSelector() {
