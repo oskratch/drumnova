@@ -6,6 +6,12 @@ class DrumMachine {
         this.isPlaying = false;
         this.bpm = 120;
         this.intervalId = null;
+        this.rafId = null;
+        this.SCHEDULER_INTERVAL = 25;  // ms between scheduler runs
+        this.SCHEDULE_AHEAD = 0.1;     // seconds of audio queued in advance
+        this.nextStepTime = 0;
+        this.visualQueue = [];
+        this.scheduledSources = new Set();
 
         this.totalBlocks = 1;
         this.currentBlock = 0;
@@ -136,7 +142,6 @@ class DrumMachine {
             document.getElementById('bpmValue').textContent = this.bpm;
             const mtbBpm = document.getElementById('mtbBpm');
             if (mtbBpm) mtbBpm.textContent = this.bpm;
-            if (this.isPlaying) { this.stop(); this.play(); }
         });
 
         const swingSlider = document.getElementById('swingSlider');
@@ -544,7 +549,8 @@ class DrumMachine {
         }
     }
 
-    playSound(soundName, channel = null, swingDelay = 0, velocity = 0.7) {
+    // `when` is an absolute AudioContext time (0 = immediately)
+    playSound(soundName, channel = null, when = 0, velocity = 0.7) {
         if (!this.audioBuffers[soundName]) {
             console.warn(`Sound not found: ${soundName}`);
             return;
@@ -560,7 +566,11 @@ class DrumMachine {
         source.connect(gainNode);
         gainNode.connect(this.dryGain);
         gainNode.connect(this.reverbNode);
-        source.start(this.audioContext.currentTime + swingDelay);
+        source.startTime = Math.max(when, this.audioContext.currentTime);
+        source.start(source.startTime);
+
+        this.scheduledSources.add(source);
+        source.onended = () => this.scheduledSources.delete(source);
     }
 
     toggleMute(channel) {
@@ -673,16 +683,28 @@ class DrumMachine {
 
         if (this.audioContext.state === 'suspended') await this.audioContext.resume();
 
-        const stepDuration = (60 / this.bpm) * 1000 / 4;
-        this.intervalId = setInterval(() => {
-            this.processStep();
-            this.currentStep++;
-            if (this.currentStep >= this.totalBlocks * this.steps) this.currentStep = 0;
-        }, stepDuration);
+        if (this.isPlaying === false) return; // paused while resuming the audio context
+        this.visualQueue = [];
+        this.nextStepTime = this.audioContext.currentTime + 0.05;
+        this.scheduler();
+        this.intervalId = setInterval(() => this.scheduler(), this.SCHEDULER_INTERVAL);
+        this.rafId = requestAnimationFrame(() => this.drawLoop());
     }
 
     pause() {
         this.isPlaying = false;
+        cancelAnimationFrame(this.rafId);
+        // Resume from the first step that has not been heard yet, and silence what is already queued
+        if (this.visualQueue.length) this.currentStep = this.visualQueue[0].step;
+        this.visualQueue = [];
+        const now = this.audioContext.currentTime;
+        this.scheduledSources.forEach(source => {
+            // Let sounds that already started ring out, cancel only the ones still queued
+            if (source.startTime > now) {
+                try { source.stop(); } catch (e) { /* already stopped */ }
+                this.scheduledSources.delete(source);
+            }
+        });
         document.getElementById('playBtn').textContent = '▶ Play';
         document.getElementById('playBtn').classList.remove('playing');
         const mobilePlay = document.getElementById('mobilePlayBtn');
@@ -697,14 +719,53 @@ class DrumMachine {
         this.currentStep = 0;
     }
 
-    processStep() {
-        const blockIndex = Math.floor(this.currentStep / this.steps);
-        const stepInBlock = this.currentStep % this.steps;
+    // Lookahead scheduler: a coarse timer queues every step that falls inside the
+    // next SCHEDULE_AHEAD seconds using absolute AudioContext times.
+    scheduler() {
+        const horizon = this.audioContext.currentTime + this.SCHEDULE_AHEAD;
+        while (this.nextStepTime < horizon) {
+            if (this.currentStep >= this.totalBlocks * this.steps) this.currentStep = 0;
+            this.scheduleStep(this.currentStep, this.nextStepTime);
+            // BPM is read on every step, so tempo changes apply live
+            this.nextStepTime += (60 / this.bpm) / 4;
+            this.currentStep++;
+        }
+    }
+
+    scheduleStep(stepIndex, time) {
+        const blockIndex = Math.floor(stepIndex / this.steps);
+        const stepInBlock = stepIndex % this.steps;
 
         let swingDelay = 0;
         if (stepInBlock % 2 === 1 && this.swing > 0) {
             swingDelay = (this.swing / 100) * ((60 / this.bpm) / 4);
         }
+        const when = time + swingDelay;
+
+        for (let channel = 0; channel < this.channels; channel++) {
+            const step = this.sequence[blockIndex]?.[channel]?.[stepInBlock];
+            if (step?.active && !this.mutedChannels[channel]) {
+                this.playSound(this.soundMap[channel], channel, when, step.velocity);
+            }
+        }
+        this.visualQueue.push({ step: stepIndex, time: when });
+    }
+
+    // Runs on every animation frame and shows steps whose audio time has been reached
+    drawLoop() {
+        if (!this.isPlaying) return;
+        const now = this.audioContext.currentTime;
+        let due = null;
+        while (this.visualQueue.length && this.visualQueue[0].time <= now) {
+            due = this.visualQueue.shift();
+        }
+        if (due) this.processStep(due.step);
+        this.rafId = requestAnimationFrame(() => this.drawLoop());
+    }
+
+    processStep(stepIndex) {
+        const blockIndex = Math.floor(stepIndex / this.steps);
+        const stepInBlock = stepIndex % this.steps;
 
         const shouldShowVisual = blockIndex >= this.currentBlock &&
             blockIndex < this.currentBlock + this.visibleBlocks;
@@ -712,10 +773,10 @@ class DrumMachine {
         if (shouldShowVisual) this.clearPlayingIndicators();
 
         for (let channel = 0; channel < this.channels; channel++) {
-            const step = this.sequence[blockIndex][channel][stepInBlock];
+            const step = this.sequence[blockIndex]?.[channel]?.[stepInBlock];
+            if (!step) continue;
 
             if (step.active && !this.mutedChannels[channel]) {
-                this.playSound(this.soundMap[channel], channel, swingDelay, step.velocity);
                 if (shouldShowVisual) {
                     const visualStep = (blockIndex - this.currentBlock) * this.steps + stepInBlock;
                     const pad = document.querySelector(`[data-channel="${channel}"][data-step="${visualStep}"]`);
