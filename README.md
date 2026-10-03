@@ -1,26 +1,26 @@
 # DrumNova - Drum Machine
 
-🌐 **[Try the live demo](https://drumnova.oscarperiche.com)**
+**[Try the live demo](https://drumnova.oscarperiche.com)**
 
-A browser-based drum machine inspired by classic hardware sequencers like the TR-808 and Redrum. Built entirely with vanilla JS, CSS, and HTML. No frameworks, no dependencies, no build step.
+A drum machine that runs in the browser, inspired by hardware sequencers like the TR-808 and Redrum. Written in plain JavaScript, CSS and HTML, with no frameworks, dependencies or build step.
 
 ## Features
 
-- **Hardware-style UI**, dark matte panel aesthetic with per-channel LED color coding
-- **8 instrument channels**, Kick, Snare, HiHat, Clap, Tom, Perc, Cymbal, FX, each with its own accent color
-- **5 sound variants per channel**, 40 procedurally synthesised sounds via Web Audio API (no audio files)
-- **16 steps × 8 blocks**, up to 128-step patterns; choose 1/2/4/8 active blocks
-- **Multi-block view**, see and edit 1, 2, or 4 blocks at once
-- **Velocity per pad**, ghost notes (Alt+click), normal hits (click), accents (Shift+click)
-- **Swing/Shuffle**, adjustable groove from 0 to 75%
-- **Reverb effect**, synthetic convolution reverb with send control
-- **Master bus**, WaveShaper saturation + dynamics compressor for punch and warmth
-- **Mute per channel**, keyboard shortcuts 1–8
-- **Volume dial per channel**, drag vertically to adjust
-- **Save/Load patterns**, JSON export with full settings (BPM, swing, reverb, sound selections, velocities)
-- **Autosave**, current pattern is saved to LocalStorage every 5 seconds and restored automatically on reload
-- **8 demo patterns**, Rock Steady, Funk Soul, Boom Bap, Industrial Pulse, New Wave Icon, Four to the Floor, Tension Build, Poly Rhythm
-- **Mobile-optimised**, fixed transport bar at bottom, collapsible controls, 40px touch targets, per-channel settings modal
+- **Hardware-style UI**: dark panel with a LED colour per channel
+- **8 instrument channels**: Kick, Snare, HiHat, Clap, Tom, Perc, Cymbal, FX, each with its own accent color
+- **5 sound variants per channel**: 40 procedurally synthesised sounds via Web Audio API (no audio files)
+- **16 steps × 8 blocks**: up to 128-step patterns; choose 1/2/4/8 active blocks
+- **Multi-block view**: see and edit 1, 2, or 4 blocks at once
+- **Velocity per pad**: ghost notes (Alt+click), normal hits (click), accents (Shift+click)
+- **Swing/Shuffle**: adjustable groove from 0 to 75%
+- **Reverb effect**: synthetic convolution reverb with send control
+- **Master bus**: WaveShaper saturation followed by a dynamics compressor
+- **Mute per channel**: keyboard shortcuts 1–8
+- **Volume dial per channel**: drag vertically to adjust
+- **Save/Load patterns**: JSON export with full settings (BPM, swing, reverb, sound selections, velocities)
+- **Autosave**: current pattern is saved to LocalStorage every 5 seconds and restored automatically on reload
+- **8 demo patterns**: Rock Steady, Funk Soul, Boom Bap, Industrial Pulse, New Wave Icon, Four to the Floor, Tension Build, Poly Rhythm
+- **Mobile-optimised**: fixed transport bar at bottom, collapsible controls, 40px touch targets, per-channel settings modal
 
 ## Quick Start
 
@@ -36,18 +36,18 @@ A browser-based drum machine inspired by classic hardware sequencers like the TR
 
 ## Controls
 
-**Transport**, Play/Pause (`Space`), Stop (`Esc`), Clear (`Ctrl+C`)
+**Transport**: Play/Pause (`Space`), Stop (`Esc`), Clear (`Ctrl+C`)
 
 **Pads**
 - Click → normal hit (70% velocity)
 - Shift+Click → accent (100%, gold glow)
 - Alt+Click → ghost note (30%, faded)
 
-**Blocks**, set 1/2/4/8 total blocks; navigate with `←` `→` arrows
+**Blocks**: set 1/2/4/8 total blocks; navigate with `←` `→` arrows
 
-**View**, show 1, 2, or 4 blocks simultaneously for easier editing
+**View**: show 1, 2 or 4 blocks at once
 
-**Channel shortcuts**, keys `1`–`8` toggle mute per channel
+**Channel shortcuts**: keys `1`–`8` toggle mute per channel
 
 ## Architecture
 
@@ -88,7 +88,7 @@ myPattern: {
 
 ## Save & Load
 
-**UI**, SAVE downloads a `.json` file; OPEN loads it back. The file includes pattern data, BPM, swing, reverb, sound selections, volumes, and mute states.
+**UI**: SAVE downloads a `.json` file; OPEN loads it back. The file includes pattern data, BPM, swing, reverb, sound selections, volumes, and mute states.
 
 **Console API**
 ```js
@@ -97,22 +97,12 @@ drumMachine.importPattern(data)    // loads pattern object
 drumMachine.loadSoundFile('kick', 'sounds/my-kick.wav')  // replace a synth sound
 ```
 
-## What's Done
-
-- ✅ 8 channels, multiple sound variants, block system (up to 128 steps)
-- ✅ Velocity system (ghost / normal / accent)
-- ✅ Swing, reverb, master compression, WaveShaper saturation
-- ✅ TR-909-style metallic oscillator synthesis
-- ✅ Hardware-aesthetic UI with per-channel LED colours
-- ✅ Mobile layout with fixed transport bar and collapsible controls
-- ✅ Save/Load patterns as JSON
-- ✅ Keyboard shortcuts
-- ✅ LocalStorage pattern persistence
+## Roadmap
 
 Planned features and future ideas are tracked in [TODO.md](TODO.md).
 
 ## License
 
-MIT. Use it, fork it, learn from it.
+MIT.
 
 Made by [Oscar Periche](https://oscarperiche.com).
